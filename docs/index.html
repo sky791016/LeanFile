@@ -174,15 +174,13 @@
 
 <section id="shots">
   <div class="wrap">
-    <h2 data-i18n="start.dl":"下载安装包（.pkg）",
-    "adv.title":"广告合作","adv.lede":"你的产品，出现在每一位 LeanFile 用户窗口的左下角——一张用户干活时真的会看到的小卡片，明码标注广告，可以关掉，永不弹窗。","adv.c1t":"广告位","adv.c1p":"侧栏卡片，18 秒轮换，全体用户可见。标注「广告」，一键隐藏（本次会话）。没有跟踪像素，没有小动作。","adv.c2t":"规格","adv.c2p":"标题 14 字以内，文案 50 字以内，一个落地链接，一个图标和配色。你发文字，剩下的我们来。","adv.c3t":"首发合作价","adv.c3p":"早期合作伙伴价格：体验周 ¥99，标准月 ¥499，季度 ¥1,299。早期用户，早期价格。","adv.how":"怎么接入：1）发邮件给品牌、标题、文案、链接和投放周期；2）一天内审核——误导性和灰产产品不接；3）微信或支付宝付款，24 小时内通过远程配置上线，不用等应用发版。现阶段用户量处于早期，你买的是 crowd 之前的价格。","adv.btn":"发邮件申请",
-    "sponsor.title":"赞助 LeanFile","sponsor.lede":"LeanFile 免费开源，由史凯（Kai Shi）开发。如果它帮你找回过哪怕一个文件，请他喝杯咖啡就是最好的支持——两档任选，支付方式陆续开通：","sponsor.usd.p":"一次性赞助，美元。","sponsor.cny.p":"一次性赞助，人民币。","sponsor.btn":"通过 GitHub 赞助","sponsor.more.t":"更多方式，陆续开通","sponsor.more.p":"GitHub Sponsors 先行；Stripe、微信支付、支付宝的直接付款链接将在各自通道开通后出现在这里。点赞也有用——它告诉下一个人：这个工具是真的。","sponsor.star":"给仓库点 Star",
-    "shots.title">The real thing</h2>
+    <h2 data-i18n="shots.title">The real thing</h2>
     <p class="lede" data-i18n="shots.lede">Screenshots from the running app, on its first user's live registry — 2,056 files:</p>
     <div class="shots">
       <figure><img src="img/shots/pub-dashboard.png" alt="LeanFile dashboard"><figcaption data-i18n="shot.1">Dashboard — totals, category & type breakdowns, production by day.</figcaption></figure>
       <figure><img src="img/shots/pub-conversation.png" alt="Conversation files"><figcaption data-i18n="shot.2">One conversation's output — with one-click bundle export.</figcaption></figure>
       <figure class="wide"><img src="img/shots/pub-drill.png" alt="Drill-down"><figcaption data-i18n="shot.3">Click a category and its files appear on the right — drill-down, list or thumbnail grid.</figcaption></figure>
+      <figure><img src="img/shots/pub-tags.png" alt="Tags"><figcaption data-i18n="shot.6">Auto tags — drop files anywhere; category, time, content and project tags organize them. Combine filters across dimensions.</figcaption></figure>
       <figure><img src="img/shots/pub-rules.png" alt="Auto rules"><figcaption data-i18n="shot.4">Auto rules — off by default; you switch on what LeanFile may do.</figcaption></figure>
       <figure><img src="img/shots/pub-conversations.png" alt="Conversations"><figcaption data-i18n="shot.5">224 conversations — files remembered the way you remember them.</figcaption></figure>
     </div>
@@ -191,8 +189,7 @@
 
 <section id="bench">
   <div class="wrap">
-    <h2 data-i18n="shots.title":"真实系统截图","shots.lede":"来自运行中应用的真实截图，第一位用户的真实登记库——2,056 个文件：","shot.1":"总览——文件总数、分类与类型构成、按日产出。","shot.2":"一次对话的全部产出——右上角一键打包导出。","shot.3":"点任意分类，该类文件立即出现在右侧——下钻，列表与预览图可切换。","shot.4":"自动规则——默认全关，开哪条，LeanFile 才做哪条。","shot.5":"224 次对话——按你回想文件的方式组织文件。",
-    "bench.title">Measured, not promised</h2>
+    <h2 data-i18n="bench.title">Measured, not promised</h2>
     <p class="lede" data-i18n="bench.lede">Engine benchmarks on a synthetic fragmented corpus — 25,325 files: variant groups, duplicate pairs, shard sets, and noise.</p>
     <table>
       <tr><th data-i18n="bench.h1">Operation</th><th data-i18n="bench.h2">Result</th></tr>
@@ -223,7 +220,7 @@
     <h2 data-i18n="open.title">Open core, honestly</h2>
     <p class="lede" data-i18n="open.lede">The local core is open source under Apache 2.0 — full-featured, forever. The official cloud is an optional add-on for people without local compute: hosted processing, sync & backup, team collaboration. Your files stay exportable, stopping payment never touches your assets, and cloud processing never trains on your data.</p>
     <div class="road">
-      <span data-i18n="road.1">Roadmap: resident helper (FSEvents + APFS snapshots)</span>
+      <span data-i18n="road.1">Shipped: resident watcher — new files are registered automatically, with auto tags</span>
       <span data-i18n="road.2">Roadmap: photo/video near-duplicate detection</span>
       <span data-i18n="road.3">Roadmap: semantic “describe it” search</span>
     </div>
@@ -346,11 +343,37 @@ const I18N = {
     "a3.t":"算力分层","a3.d":"本地算法优先，其次本地模型或自备端点，最后才是可选官方云——每次运行都记录用了哪层算力、花了多少。",
     "open.title":"Open Core，讲实话",
     "open.lede":"本地核心以 Apache 2.0 开源——功能完整、永久免费。官方云是给没有本地算力的人的可选增值：托管算力、同步备份、团队协作。你的文件永远可全量导出；停付不影响任何已有文件；云端处理绝不拿你的数据训练。",
-    "road.1":"路线图：常驻守护进程（FSEvents + APFS 快照留版）","road.2":"路线图：图片/视频近似去重","road.3":"路线图：语义“说人话”找回",
+    "road.1":"已上线：常驻监听——新文件自动入库、自动打标签","road.2":"路线图：图片/视频近似去重","road.3":"路线图：语义“说人话”找回",
     "start.title":"快速开始",
     "start.lede":"引擎今天是一个 Python CLI；macOS 应用只需 Command Line Tools 即可构建。",
     "foot.family":"史凯（Kai Shi）的 Lean 家族一员——《精益数据方法论》· Lean AI · LeanFDE。",
     "foot.note":"内部代号：MM1031。"
+    "start.dl":"下载安装包（.pkg）",
+    "shot.6":"自动标签——文件随便放，类别、时间、内容、项目自动成签，点几个标签跨维度组合筛选。",
+    "adv.title":"广告合作",
+    "adv.lede":"你的产品，出现在每一位 LeanFile 用户窗口的左下角——一张用户干活时真的会看到的小卡片，明码标注广告，可以关掉，永不弹窗。",
+    "adv.c1t":"广告位",
+    "adv.c1p":"侧栏卡片，18 秒轮换，全体用户可见。标注「广告」，一键隐藏（本次会话）。没有跟踪像素，没有小动作。",
+    "adv.c2t":"规格",
+    "adv.c2p":"标题 14 字以内，文案 50 字以内，一个落地链接，一个图标和配色。你发文字，剩下的我们来。",
+    "adv.c3t":"首发合作价",
+    "adv.c3p":"早期合作伙伴价格：体验周 ¥99，标准月 ¥499，季度 ¥1,299。早期用户，早期价格。",
+    "adv.how":"怎么接入：1）发邮件给品牌、标题、文案、链接和投放周期；2）一天内审核——误导性和灰产产品不接；3）微信或支付宝付款，24 小时内通过远程配置上线，不用等应用发版。现阶段用户量处于早期，你买的是 crowd 之前的价格。",
+    "adv.btn":"发邮件申请",
+    "sponsor.title":"赞助 LeanFile",
+    "sponsor.lede":"LeanFile 免费开源，由史凯（Kai Shi）开发。如果它帮你找回过哪怕一个文件，请他喝杯咖啡就是最好的支持——两档任选，支付方式陆续开通：",
+    "sponsor.usd.p":"一次性赞助，美元。",
+    "sponsor.cny.p":"一次性赞助，人民币。",
+    "sponsor.btn":"通过 GitHub 赞助",
+    "sponsor.more.t":"更多方式，陆续开通",
+    "sponsor.more.p":"GitHub Sponsors 先行；Stripe、微信支付、支付宝的直接付款链接将在各自通道开通后出现在这里。点赞也有用——它告诉下一个人：这个工具是真的。",
+    "sponsor.star":"给仓库点 Star",
+    "shots.lede":"来自运行中应用的真实截图，第一位用户的真实登记库——2,056 个文件：",
+    "shot.1":"总览——文件总数、分类与类型构成、按日产出。",
+    "shot.2":"一次对话的全部产出——右上角一键打包导出。",
+    "shot.3":"点任意分类，该类文件立即出现在右侧——下钻，列表与预览图可切换。",
+    "shot.4":"自动规则——默认全关，开哪条，LeanFile 才做哪条。",
+    "shot.5":"224 次对话——按你回想文件的方式组织文件。",
   }
 };
 function setLang(l){
