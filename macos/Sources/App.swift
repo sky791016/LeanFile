@@ -225,6 +225,12 @@ final class Store: ObservableObject {
     func openDrill(title: String, category: String? = nil, type: String? = nil,
                    protect: Bool = false, finals: Bool = false) {
         drillTitle = title
+        // The dashboard List's selection binding resolves selection
+        // changes to select(asset:), which closes the drill. Clear the
+        // selection and show the drill immediately so no stale selection
+        // event from the same tap can kill it afterwards.
+        selectedAssetId = nil
+        detailShowsDrill = true
         queue.async { [weak self] in
             guard let self, let db = self.db else { return }
             let files = db.filesForDrill(
@@ -664,15 +670,12 @@ struct DashboardView: View {
     @EnvironmentObject var store: Store
 
     var body: some View {
-        List(selection: Binding(
-            get: { store.selectedAssetId },
-            set: { id in
-                store.selectedAssetId = id
-                if let id, let a = (store.assets + store.dashFiles).first(where: { $0.id == id }) {
-                    store.select(asset: a)
-                }
-            }
-        )) {
+        // NOTE: no selection binding on this List. A selectable List
+        // generates selection values from row identities and re-asserts
+        // them around content changes; the old binding resolved those
+        // to select(asset:), which closed an open drill. File rows below
+        // use explicit buttons instead.
+        List {
             SwiftUI.Section {
                 LazyVGrid(
                     columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
@@ -791,7 +794,12 @@ struct DashboardView: View {
             }
             SwiftUI.Section(L.f("dash.filesFmt", store.dashTotal)) {
                 ForEach(store.dashFiles) { a in
-                    AssetRowView(asset: a).tag(a.id)
+                    Button {
+                        store.select(asset: a)
+                    } label: {
+                        AssetRowView(asset: a)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
