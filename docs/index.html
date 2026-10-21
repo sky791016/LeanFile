@@ -74,6 +74,7 @@
   .shots img{width:100%;display:block}
   .shots figcaption{padding:10px 14px;font-size:13.5px;color:var(--mut)}
   @media (min-width:900px){.shots .wide{grid-column:span 2}}
+.price{font-size:34px;font-weight:750;color:var(--ink);margin:6px 0}
 .road span{background:#fff;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:7px 16px;font-size:13.5px}
 </style>
 </head>
@@ -173,7 +174,8 @@
 
 <section id="shots">
   <div class="wrap">
-    <h2 data-i18n="shots.title">The real thing</h2>
+    <h2 data-i18n="sponsor.title":"赞助 LeanFile","sponsor.lede":"LeanFile 免费开源，由史凯（Kai Shi）开发。如果它帮你找回过哪怕一个文件，请他喝杯咖啡就是最好的支持——两档任选，支付方式陆续开通：","sponsor.usd.p":"一次性赞助，美元。","sponsor.cny.p":"一次性赞助，人民币。","sponsor.btn":"通过 GitHub 赞助","sponsor.more.t":"更多方式，陆续开通","sponsor.more.p":"GitHub Sponsors 先行；Stripe、微信支付、支付宝的直接付款链接将在各自通道开通后出现在这里。点赞也有用——它告诉下一个人：这个工具是真的。","sponsor.star":"给仓库点 Star",
+    "shots.title">The real thing</h2>
     <p class="lede" data-i18n="shots.lede">Screenshots from the running app, on its first user's live registry — 2,056 files:</p>
     <div class="shots">
       <figure><img src="img/shots/pub-dashboard.png" alt="LeanFile dashboard"><figcaption data-i18n="shot.1">Dashboard — totals, category & type breakdowns, production by day.</figcaption></figure>
@@ -222,6 +224,18 @@
       <span data-i18n="road.1">Roadmap: resident helper (FSEvents + APFS snapshots)</span>
       <span data-i18n="road.2">Roadmap: photo/video near-duplicate detection</span>
       <span data-i18n="road.3">Roadmap: semantic “describe it” search</span>
+    </div>
+  </div>
+</section>
+
+<section id="sponsor">
+  <div class="wrap">
+    <h2 data-i18n="sponsor.title">Sponsor LeanFile</h2>
+    <p class="lede" data-i18n="sponsor.lede">LeanFile is free and open source, built by Kai Shi. If it ever found a file for you, a coffee is the best support it can get — pick either tier, in any currency rail you like:</p>
+    <div class="cards">
+      <div class="card"><div class="price">$9.9</div><p data-i18n="sponsor.usd.p">One-time sponsorship, USD.</p><a class="btn" href="https://github.com/sky791016/LeanFile" data-i18n="sponsor.btn">Sponsor via GitHub</a></div>
+      <div class="card"><div class="price">¥19.9</div><p data-i18n="sponsor.cny.p">One-time sponsorship, CNY.</p><a class="btn" href="https://github.com/sky791016/LeanFile" data-i18n="sponsor.btn">Sponsor via GitHub</a></div>
+      <div class="card"><h3 data-i18n="sponsor.more.t">More ways, rolling out</h3><p data-i18n="sponsor.more.p">GitHub Sponsors is live first; direct Stripe, WeChat Pay and Alipay links will appear here as each rail opens. Stars help too — they tell the next person this tool is real.</p><a class="btn ghost" href="https://github.com/sky791016/LeanFile" data-i18n="sponsor.star">Star the repo</a></div>
     </div>
   </div>
 </section>

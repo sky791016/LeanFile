@@ -35,6 +35,7 @@ enum Section: String, CaseIterable, Identifiable {
     case nodes = "nodes"
     case cleanup = "cleanup"
     case rules = "rules"
+    case about = "about"
     var id: String { rawValue }
     var title: String { L.t("section." + key) }
     var key: String {
@@ -47,6 +48,7 @@ enum Section: String, CaseIterable, Identifiable {
         case .nodes: return "nodes"
         case .cleanup: return "cleanup"
         case .rules: return "rules"
+        case .about: return "about"
         }
     }
     var icon: String {
@@ -59,6 +61,7 @@ enum Section: String, CaseIterable, Identifiable {
         case .nodes: return "externaldrive.connected.to.line.below"
         case .cleanup: return "trash"
         case .rules: return "slider.horizontal.3"
+        case .about: return "person.crop.circle"
         }
     }
 }
@@ -180,6 +183,8 @@ final class Store: ObservableObject {
                 preview = db.cleanupPreview(
                     staleDays: Int(m["stale_versions_days"] ?? "30") ?? 30
                 )
+            case .about:
+                break
             case .inbox, .library, .finals, .nodes, .cleanup:
                 newAssets = db.assets(section: snap.section.key, search: snap.search)
             }
@@ -418,6 +423,7 @@ struct ContentView: View {
         case .cleanup: return store.counts.dups
         case .nodes: return store.nodes.count
         case .rules: return 0
+        case .about: return 0
         }
     }
 
@@ -442,6 +448,8 @@ struct ContentView: View {
             DashboardView()
         case .rules:
             RulesView()
+        case .about:
+            AboutView()
         case .conversations:
             if let cid = store.selectedConversationId,
                let conv = store.conversationsList.first(where: { $0.id == cid }) {
@@ -1037,6 +1045,96 @@ struct DrillTile: View {
 }
 
 
+// MARK: - About the author
+
+struct AboutView: View {
+    private var feedbackURL: URL {
+        var c = URLComponents(string: "mailto:sky.kugua@gmail.com")!
+        c.queryItems = [
+            URLQueryItem(name: "subject", value: "LeanFile 反馈 / Feedback"),
+            URLQueryItem(name: "body",
+                         value: "我想反馈：\n\n（发生了什么、期望是什么，都可以写）"),
+        ]
+        return c.url!
+    }
+
+    private func avatar() -> NSImage? {
+        if let p = Bundle.main.path(forResource: "avatar", ofType: "jpg") {
+            return NSImage(contentsOfFile: p)
+        }
+        return nil
+    }
+
+    var body: some View {
+        Form {
+            SwiftUI.Section {
+                HStack(spacing: 16) {
+                    Image(nsImage: NSApplication.shared.applicationIconImage)
+                        .resizable().frame(width: 56, height: 56)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("LeanFile").font(.title2).bold()
+                        Text(L.t("about.app")).foregroundStyle(.secondary)
+                    }
+                }
+            }
+            SwiftUI.Section {
+                HStack(alignment: .top, spacing: 16) {
+                    if let img = avatar() {
+                        Image(nsImage: img).resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 92, height: 92)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color(
+                                red: 0.79, green: 0.64, blue: 0.15),
+                                lineWidth: 2))
+                    }
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("史凯 Kai Shi").font(.title3).bold()
+                        Text(L.t("about.role"))
+                            .font(.subheadline).foregroundStyle(.secondary)
+                        Text(L.t("about.bio")).font(.body)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.vertical, 6)
+            }
+            SwiftUI.Section {
+                HStack(spacing: 12) {
+                    Link(destination: URL(string: "mailto:sky.kugua@gmail.com")!) {
+                        Label(L.t("about.email"), systemImage: "envelope")
+                    }
+                    Link(destination: feedbackURL) {
+                        Label(L.t("about.feedback"), systemImage: "text.bubble")
+                    }
+                    Link(destination: URL(string:
+                        "https://github.com/sky791016/LeanFile")!) {
+                        Label(L.t("about.star"), systemImage: "star")
+                    }
+                }
+                .buttonStyle(.bordered)
+            }
+            SwiftUI.Section(L.t("about.sponsor.title")) {
+                Text(L.t("about.sponsor.sub")).foregroundStyle(.secondary)
+                HStack(spacing: 12) {
+                    Link(destination: URL(string:
+                        "https://sky791016.github.io/LeanFile/#sponsor")!) {
+                        Label(L.t("about.sponsor.usd"), systemImage: "heart")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    Link(destination: URL(string:
+                        "https://sky791016.github.io/LeanFile/#sponsor")!) {
+                        Label(L.t("about.sponsor.cny"), systemImage: "gift")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                Link(L.t("about.sponsor.more"), destination: URL(string:
+                    "https://sky791016.github.io/LeanFile/#sponsor")!)
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
 // MARK: - Self-shot mode (LEANFILE_SHOTS=<dir>): renders the app's own
 // window to PNGs for documentation/QA, independent of screen lock state.
 private enum SelfShot {
@@ -1078,6 +1176,8 @@ private enum SelfShot {
             store.selectConversation(c)
         }
         await wait(1.5); snap("shot-conversation.png")
+        store.select(section: .about)
+        await wait(1.5); snap("shot-about.png")
         store.select(section: .rules)
         await wait(1.5); snap("shot-rules.png")
         store.select(section: .dashboard)

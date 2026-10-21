@@ -12,6 +12,8 @@ swiftc -O -sdk "$SDK" -target arm64-apple-macosx14.0 \
   -lsqlite3 \
   -o $APP/Contents/MacOS/Guicang
 cp Info.plist $APP/Contents/Info.plist
+mkdir -p $APP/Contents/Resources
+[ -f avatar.jpg ] && cp avatar.jpg $APP/Contents/Resources/avatar.jpg
 # App icon (LeanFile): build AppIcon.icns from icon-1024.png when possible.
 if [ -f icon-1024.png ] && command -v iconutil >/dev/null 2>&1; then
   ICONSET=$(mktemp -d)/AppIcon.iconset
