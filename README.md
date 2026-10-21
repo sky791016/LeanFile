@@ -1,15 +1,15 @@
-# Trove （归藏）
+# LeanFile
 
 **Every file your AI makes — gathered, deduplicated, organized by conversation, and findable in milliseconds.**
 
 AI tools now produce files faster than any folder system can absorb:
 drafts, variants, renders, shards — thousands of near-identical files
-scattered across machines and NAS drives. Trove is the asset layer that
+scattered across machines and NAS drives. LeanFile is the asset layer that
 sits on top of your files and quietly keeps them in order.
 
-> Trove is the global name of 归藏 (Guicang, "all things return and are
-> treasured"), after the ancient *Guicang Yi*. The codebase keeps the
-> `guicang` codename.
+> LeanFile is part of the Lean family by Kai Shi — alongside the
+> Lean Data Methodology, Lean AI and LeanFDE: lean thinking applied
+> to the file chaos of the AI era. (Internal codename: `guicang`.)
 
 ## What it does — five outcomes, not process data
 
@@ -25,13 +25,13 @@ Users don't care about version graphs. They care that:
 4. **Important files can't be lost** — protected files are monitored
    for single-copy risk and replicated across storage nodes.
 5. **Junk expires by rule** — you set the rules (keep process versions
-   N days, quarantine retention, …); Trove executes them, always via
+   N days, quarantine retention, …); LeanFile executes them, always via
    quarantine first, always logged, always reversible.
 
 ## Organized by conversation
 
 You remember a file by *the chat that produced it*, not by its folder.
-Trove organizes files under the LLM conversation / work session that
+LeanFile organizes files under the LLM conversation / work session that
 created them: registrations carry conversation metadata (tool, model,
 title), and legacy files are reconstructed into sessions by project
 folder + time-window analysis — honestly labeled *inferred*, never
@@ -69,12 +69,12 @@ FTS queries 0.5–6 ms. See `BENCH-20261022.md`.
 ## Quick start (engine CLI)
 
 ```bash
-python3 -m guicang.cli --db trove.db scan-node --name mac --path ~/Documents --kind local
-python3 -m guicang.cli --db trove.db build-previews
-python3 -m guicang.cli --db trove.db infer-batches
-python3 -m guicang.cli --db trove.db conversations
-python3 -m guicang.cli --db trove.db autopilot-classify
-python3 -m guicang.cli --db trove.db cleanup-plan
+python3 -m guicang.cli --db leanfile.db scan-node --name mac --path ~/Documents --kind local
+python3 -m guicang.cli --db leanfile.db build-previews
+python3 -m guicang.cli --db leanfile.db infer-batches
+python3 -m guicang.cli --db leanfile.db conversations
+python3 -m guicang.cli --db leanfile.db autopilot-classify
+python3 -m guicang.cli --db leanfile.db cleanup-plan
 python3 tests/test_core.py   # and the other tests/test_*.py suites
 ```
 
@@ -103,7 +103,7 @@ Apache License 2.0 — see `LICENSE`.
 
 ## 中文简介
 
-归藏 Trove 是 macOS 上的 AI 文件资产层：为大模型时代“碎片化的大规模
+LeanFile 是 macOS 上的 AI 文件资产层：为大模型时代“碎片化的大规模
 文件生产”而建。自动去重、自动分类、全文检索、重要文件多副本保护、
 过程文件按规则过期清理；文件按“产生它的那次对话”组织；总览仪表盘
 下钻到任意类别的清单（列表/预览图双视图）。本地核心开源免费

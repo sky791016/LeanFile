@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- ghost sheets: scattered fragments / versions behind -->
+  <rect x="40" y="10" width="62" height="78" rx="10" fill="#14508C" opacity="0.18"/>
+  <rect x="32" y="16" width="62" height="78" rx="10" fill="#14508C" opacity="0.35"/>
+  <!-- main document -->
+  <path d="M30 24 h36 l22 22 v48 a10 10 0 0 1 -10 10 h-48 a10 10 0 0 1 -10 -10 v-60 a10 10 0 0 1 10 -10 z" fill="#0B2B4B"/>
+  <!-- folded corner -->
+  <path d="M66 24 v22 h22 z" fill="#C9A227"/>
+  <!-- L for Lean -->
+  <path d="M42 46 v32 h24" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- gold baseline -->
+  <rect x="42" y="86" width="30" height="5" rx="2.5" fill="#C9A227"/>
+</svg>

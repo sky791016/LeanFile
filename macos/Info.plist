@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>Guicang</string>
+    <string>LeanFile</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleDisplayName</key>
-    <string>归藏 Guicang</string>
+    <string>LeanFile</string>
     <key>CFBundleIdentifier</key>
     <string>tech.guicang.app</string>
     <key>CFBundleVersion</key>

@@ -6,14 +6,14 @@ struct GuicangApp: App {
     @StateObject private var store = Store()
 
     var body: some Scene {
-        WindowGroup("归藏 Guicang") {
+        WindowGroup("LeanFile") {
             ContentView()
                 .environmentObject(store)
                 .frame(minWidth: 980, minHeight: 600)
         }
         .windowStyle(.titleBar)
 
-        MenuBarExtra("归藏", systemImage: "archivebox.fill") {
+        MenuBarExtra("LeanFile", systemImage: "archivebox.fill") {
             Button(L.t("menu.open")) {
                 NSApp.activate(ignoringOtherApps: true)
             }

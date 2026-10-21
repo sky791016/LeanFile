@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 120">
+  <g>
+    <rect x="40" y="10" width="62" height="78" rx="10" fill="#FFFFFF" opacity="0.16"/>
+    <rect x="32" y="16" width="62" height="78" rx="10" fill="#FFFFFF" opacity="0.30"/>
+    <path d="M30 24 h36 l22 22 v48 a10 10 0 0 1 -10 10 h-48 a10 10 0 0 1 -10 -10 v-60 a10 10 0 0 1 10 -10 z" fill="#FFFFFF"/>
+    <path d="M66 24 v22 h22 z" fill="#C9A227"/>
+    <path d="M42 46 v32 h24" fill="none" stroke="#0B2B4B" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="42" y="86" width="30" height="5" rx="2.5" fill="#C9A227"/>
+  </g>
+  <text x="128" y="76" font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', sans-serif" font-size="46" fill="#FFFFFF"><tspan font-weight="700">Lean</tspan><tspan font-weight="400">File</tspan></text>
+</svg>
