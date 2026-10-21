@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import sys
 
 from .core import Registry, load_manifest_for
@@ -69,6 +70,17 @@ def main(argv=None):
     p.add_argument("--no-ql", action="store_true")
 
     sub.add_parser("infer-batches")
+
+    p = sub.add_parser("bundle")
+    p.add_argument("conversation", nargs="?", help="id prefix or title keyword")
+    p.add_argument("--latest", action="store_true", help="bundle the most recent conversation")
+    p.add_argument("--out", help="output directory (default ~/LeanFile-Exports/...)")
+
+    p = sub.add_parser("protect-run")
+    p.add_argument("--to", dest="target", help="target node name")
+    p.add_argument("--yes", action="store_true", help="execute the copies (default: plan only)")
+
+    sub.add_parser("shards")
 
     p = sub.add_parser("conversations")
     p.add_argument("--files", action="store_true", help="list files per conversation")
@@ -225,6 +237,44 @@ def main(argv=None):
             if args.files:
                 for it in c["items"]:
                     print(f"    · {it['name']} ({it['atype']}, {it['state']})")
+    elif args.cmd == "bundle":
+        from .deliver import export_bundle
+
+        out = export_bundle(args.db, args.conversation,
+                            latest=args.latest, out_root=args.out)
+        if out.get("error"):
+            print("打包失败:", out["error"])
+        else:
+            print(f"已打包 · {out['title']} · {out['count']} 个文件 · {out['bytes']} B")
+            print("目录:", out["dir"])
+            for m in out["missing"]:
+                print("缺失（源文件不在磁盘）:", m)
+    elif args.cmd == "protect-run":
+        from .deliver import protect_run
+
+        out = protect_run(args.db, target_node=args.target, execute=args.yes)
+        if out.get("error"):
+            print("补副本失败:", out["error"])
+        else:
+            verb = "已复制" if args.yes else "计划复制"
+            items = out["done"] if args.yes else out["planned"]
+            print(f"重要文件共 {out['protect_total']} 个 · 目标位置 {out['target']} · {verb} {len(items)} 个")
+            for it in items:
+                print(f"  · {it['asset']} -> {it['dest']}")
+            for sk in out["skipped"]:
+                print(f"  跳过 · {sk['asset']}（{sk['why']}）")
+    elif args.cmd == "shards":
+        from .engine import detect_shard_groups
+        from . import nodes as nodes_mod
+
+        reg = Registry(args.db)
+        nodes_mod.ensure_tables(reg)
+        groups = detect_shard_groups(reg.db)
+        print(f"分片组 {len(groups)} 组（同名分片、本可拼回一个整体）")
+        for g in groups:
+            print(f"  · {g['stem']} · {len(g['members'])} 片 · {g['dir']}")
+            for pth, _h in g["members"]:
+                print(f"      - {os.path.basename(pth)}")
     elif args.cmd == "infer-batches":
         from .preview import infer_conversation_batches
 

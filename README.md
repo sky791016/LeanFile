@@ -27,6 +27,12 @@ Users don't care about version graphs. They care that:
 5. **Junk expires by rule** — you set the rules (keep process versions
    N days, quarantine retention, …); LeanFile executes them, always via
    quarantine first, always logged, always reversible.
+6. **Conversations pack themselves for handover** — one click bundles
+   what a conversation produced (each asset's latest version from that
+   conversation) into a clean folder with a manifest.
+7. **Shard groups are visible** — files that are really fragments of
+   one whole (part files, sequence splits) are detected and listed as
+   groups, so pieces can be reunited instead of scattered.
 
 ## Organized by conversation
 
@@ -75,6 +81,9 @@ python3 -m guicang.cli --db leanfile.db infer-batches
 python3 -m guicang.cli --db leanfile.db conversations
 python3 -m guicang.cli --db leanfile.db autopilot-classify
 python3 -m guicang.cli --db leanfile.db cleanup-plan
+python3 -m guicang.cli --db leanfile.db bundle --latest      # pack a conversation for handover
+python3 -m guicang.cli --db leanfile.db protect-run --yes    # verified 2nd copies of important files
+python3 -m guicang.cli --db leanfile.db shards               # list shard groups
 python3 tests/test_core.py   # and the other tests/test_*.py suites
 ```
 

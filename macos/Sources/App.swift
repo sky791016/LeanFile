@@ -78,6 +78,7 @@ final class Store: ObservableObject {
     @Published var rules: [String: String] = [:]
     @Published var cleanupPreview = (stale: 0, dedup: 0, ephemeral: 0)
     @Published var cleanupResult = ""
+    @Published var actionMsg = ""
     @Published var nodes: [NodeRow] = []
     @Published var dups: [DupRow] = []
     @Published var conversationsList: [ConversationRow] = []
@@ -335,6 +336,42 @@ final class Store: ObservableObject {
             }
         }
     }
+
+    private func cli(_ args: [String], done: @escaping (String) -> Void) {
+        queue.async { [weak self] in
+            guard let self, let db = self.db else { return }
+            let home = FileManager.default.homeDirectoryForCurrentUser.path
+            let repo = home + "/guicang-dev"
+            let p = Process()
+            p.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
+            p.arguments = ["-m", "guicang.cli", "--db", db.path] + args
+            p.currentDirectoryURL = URL(fileURLWithPath: repo)
+            let pipe = Pipe()
+            p.standardOutput = pipe
+            p.standardError = pipe
+            var result = ""
+            do {
+                try p.run()
+                p.waitUntilExit()
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                result = String(data: data, encoding: .utf8) ?? ""
+            } catch {
+                result = "\(error.localizedDescription)"
+            }
+            DispatchQueue.main.async {
+                done(result)
+                self.reload()
+            }
+        }
+    }
+
+    func runBundle(_ convId: String) {
+        cli(["bundle", convId]) { [weak self] out in self?.actionMsg = out }
+    }
+
+    func runProtect() {
+        cli(["protect-run", "--yes"]) { [weak self] out in self?.actionMsg = out }
+    }
 }
 
 struct ContentView: View {
@@ -411,9 +448,17 @@ struct ContentView: View {
                         Spacer()
                         Text(L.f("conv.produced", conv.files))
                             .font(.caption).foregroundStyle(.secondary)
+                        Button(L.t("conv.bundle")) { store.runBundle(conv.id) }
                     }
                     .padding(8)
                     Divider()
+                    if !store.actionMsg.isEmpty {
+                        Text(store.actionMsg)
+                            .font(.caption).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(8)
+                        Divider()
+                    }
                     assetListView
                 }
             } else {
@@ -661,6 +706,26 @@ struct DashboardView: View {
                     }.buttonStyle(.plain)
                 }
                 .padding(.vertical, 4)
+            }
+            if store.dash.protectAtRisk > 0 {
+                SwiftUI.Section {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L.f("card.protectRisk", store.dash.protectAtRisk))
+                                .font(.headline)
+                            Text(L.t("ov.protectHint"))
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button(L.t("ov.protectNow")) { store.runProtect() }
+                    }
+                }
+            }
+            if !store.actionMsg.isEmpty {
+                SwiftUI.Section {
+                    Text(store.actionMsg)
+                        .font(.caption).foregroundStyle(.secondary)
+                }
             }
             SwiftUI.Section(L.t("dash.byCategory")) {
                 ForEach(store.dash.byCategory) { r in
