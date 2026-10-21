@@ -35,11 +35,27 @@ class Result:
         }
 
 
+def extract_keywords(text, topn=5):
+    """Frequency keywords: latin tokens + CJK bigrams. No model."""
+    tokens = [t for t in re.findall(r"[A-Za-z0-9_]{3,}", (text or "").lower())]
+    chars = [c for c in re.findall(r"[一-鿿]", text or "")]
+    bigrams = [chars[i] + chars[i + 1] for i in range(len(chars) - 1)]
+    from collections import Counter
+
+    return [w for w, _ in Counter(tokens + bigrams).most_common(topn)]
+
+
 class LocalBasicProvider:
     """T0: extractive summary + keyword tags. No model, no network."""
 
     name = "local-basic"
     model = "extractive-v1"
+
+    def tag_keywords(self, text):
+        words = extract_keywords(text)
+        if not words:
+            raise ComputeError("no keywords extractable")
+        return Result("、".join(words), self.name, self.model, 0)
 
     def summarize(self, text):
         lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
@@ -66,6 +82,27 @@ class EndpointProvider:
         self.api_key = api_key
         self.timeout = timeout
 
+    def tag_keywords(self, text):
+        payload = {
+            "model": self.model,
+            "max_tokens": 120,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "阅读下面的文字，只输出5个最能代表它的关键词，"
+                    "用、分隔，不要编号、不要解释：\n" + text[:2000]
+                    + " /no_think",
+                }
+            ],
+        }
+        content, cost = self._chat(payload)
+        words = [w.strip().strip("*# ") for w in
+                 re.split(r"[、,，\n;；]+", content)]
+        words = [w for w in words if 2 <= len(w) <= 12][:5]
+        if not words:
+            raise ComputeError(f"{self.name} returned no keywords")
+        return Result("、".join(words), self.name, self.model, cost)
+
     def summarize(self, text):
         payload = {
             "model": self.model,
@@ -76,6 +113,10 @@ class EndpointProvider:
                 }
             ],
         }
+        content, cost = self._chat(payload)
+        return Result(content, self.name, self.model, cost)
+
+    def _chat(self, payload):
         req = urllib.request.Request(
             self.base_url + "/chat/completions",
             data=json.dumps(payload).encode(),
@@ -93,7 +134,7 @@ class EndpointProvider:
         except Exception:
             raise ComputeError(f"{self.name} bad response shape")
         cost = (data.get("usage") or {}).get("total_tokens", 0)
-        return Result(content, self.name, self.model, cost)
+        return content, cost
 
 
 class ComputeChain:
@@ -105,6 +146,15 @@ class ComputeChain:
         for p in self.providers:
             try:
                 return p.summarize(text)
+            except ComputeError as e:
+                errors.append(str(e))
+        raise ComputeError("all providers failed: " + "; ".join(errors))
+
+    def tag_keywords(self, text):
+        errors = []
+        for p in self.providers:
+            try:
+                return p.tag_keywords(text)
             except ComputeError as e:
                 errors.append(str(e))
         raise ComputeError("all providers failed: " + "; ".join(errors))

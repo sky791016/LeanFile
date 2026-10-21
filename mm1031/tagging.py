@@ -80,11 +80,18 @@ def local_keywords(text, topn=5):
 
 
 def _parse_keywords(summary):
-    m = re.search(r"关键词[:：]\s*(.+)$", summary or "")
+    m = re.search(r"关键词[:：]\s*(.+)$", summary or "", re.S)
     if not m:
         return []
-    words = re.split(r"[、,，/\s]+", m.group(1).strip())
-    return [w for w in words if len(w) >= 2][:5]
+    words = []
+    for part in re.split(r"[\n、,，;；/]+", m.group(1)):
+        p = part.strip().strip("*# ")
+        p = re.sub(r"^\d+[.、)]\s*", "", p)
+        p = re.sub(r"\*\*(.+?)\*\*", r"\1", p)
+        p = re.split(r"[（(]", p)[0].strip().strip("* ")
+        if 2 <= len(p) <= 12:
+            words.append(p)
+    return words[:5]
 
 
 def rule_tags(db, row, path=""):
@@ -173,12 +180,21 @@ def tag_all(db_path, content=False, config_path=None,
         words, provider, model, cost = [], "local-basic", "extractive-v1", 0
         if chain is not None:
             try:
-                res = chain.summarize(text)
-                words = _parse_keywords(res.text)
+                res = chain.tag_keywords(text)
+                words = [w for w in re.split(r"[、,，\s]+", res.text)
+                         if 2 <= len(w) <= 12][:5]
                 provider, model, cost = res.provider, res.model, \
                     res.cost_units
             except ComputeError:
                 words = []
+            if not words:
+                try:
+                    res = chain.summarize(text)
+                    words = _parse_keywords(res.text)
+                    provider, model, cost = res.provider, res.model, \
+                        res.cost_units
+                except ComputeError:
+                    words = []
         if not words:
             words = local_keywords(text)
             provider, model, cost = "local-basic", "extractive-v1", 0
