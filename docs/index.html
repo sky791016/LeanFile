@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeanFile — The AI file asset layer for macOS</title>
+<meta name="description" content="Every file your AI makes — gathered, deduplicated, organized by conversation, and findable in milliseconds.">
+<link rel="icon" type="image/png" href="img/mark-512.png">
+<style>
+  :root{
+    --navy:#0B2B4B; --navy2:#123E6B; --gold:#C9A227; --gold2:#D9B44A;
+    --ink:#16283C; --mut:#5A6B7E; --bg:#F6F8FB; --card:#FFFFFF; --line:#E2E9F1;
+  }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg)}
+  a{color:var(--navy2);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:10}
+  .nav{display:flex;align-items:center;gap:26px;height:62px}
+  .nav .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--navy);font-size:18px}
+  .nav .brand img{width:30px;height:30px;border-radius:7px}
+  .nav .links{display:flex;gap:22px;margin-left:8px;font-size:14.5px}
+  .nav .links a{color:var(--ink)}
+  .nav .sp{flex:1}
+  .langbtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 6px;display:flex;gap:2px}
+  .langbtn button{border:0;background:transparent;padding:4px 12px;border-radius:999px;cursor:pointer;font-size:13.5px;color:var(--mut)}
+  .langbtn button.on{background:var(--navy);color:#fff}
+  .ghbtn{background:var(--navy);color:#fff !important;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600}
+  .ghbtn:hover{background:var(--navy2);text-decoration:none}
+  .hero{background:linear-gradient(160deg,#123E6B 0%,#0B2B4B 55%,#081E38 100%);color:#fff;padding:84px 0 76px;text-align:center}
+  .hero img.icon{width:118px;height:118px;border-radius:27px;box-shadow:0 18px 44px rgba(0,0,0,.35)}
+  .hero h1{font-size:52px;margin:22px 0 6px;letter-spacing:.2px}
+  .hero .tag{font-size:21px;line-height:1.5;max-width:760px;margin:10px auto 0;color:#DCE7F3}
+  .hero .sub{font-size:15.5px;color:#9FB8D2;max-width:680px;margin:14px auto 0;line-height:1.65}
+  .cta{margin-top:30px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:12px 26px;border-radius:10px;font-weight:600;font-size:15.5px}
+  .btn.gold{background:var(--gold);color:#231a00}.btn.gold:hover{background:var(--gold2);text-decoration:none}
+  .btn.ghost{border:1.5px solid rgba(255,255,255,.55);color:#fff}.btn.ghost:hover{text-decoration:none;border-color:#fff}
+  .chips{margin-top:34px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .chip{border:1px solid rgba(255,255,255,.28);color:#DCE7F3;border-radius:999px;padding:6px 14px;font-size:13px}
+  .chip b{color:var(--gold2);font-weight:700}
+  section{padding:72px 0 8px}
+  h2{font-size:31px;color:var(--navy);text-align:center;margin:0 0 10px}
+  .lede{text-align:center;color:var(--mut);max-width:720px;margin:0 auto 38px;line-height:1.7;font-size:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 24px 20px}
+  .card .n{width:30px;height:30px;border-radius:9px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin-bottom:12px}
+  .card h3{margin:0 0 8px;font-size:17.5px;color:var(--navy)}
+  .card p{margin:0;color:var(--mut);line-height:1.65;font-size:14.5px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center}
+  @media (max-width:820px){.split{grid-template-columns:1fr}}
+  .split h2{text-align:left}.split .lede{text-align:left;margin:0 0 14px}
+  .split p{color:var(--mut);line-height:1.75;font-size:15.5px}
+  .mock{background:var(--navy);border-radius:16px;padding:22px;color:#DCE7F3;font-size:13.5px;line-height:1.9;box-shadow:0 16px 40px rgba(11,43,75,.25)}
+  .mock .row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.12);padding:5px 0}
+  .mock .row:last-child{border-bottom:0}
+  .mock b{color:#fff}.mock .g{color:var(--gold2)}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:13px 18px;text-align:left;font-size:14.5px;border-bottom:1px solid var(--line)}
+  th{background:#EEF3F9;color:var(--navy)} tr:last-child td{border-bottom:0}
+  td b{color:var(--navy)}
+  pre{background:#0B2B4B;color:#DCE7F3;border-radius:12px;padding:20px 22px;overflow-x:auto;font-size:13.5px;line-height:1.75}
+  pre .c{color:#8FA9C4}
+  .arch{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+  footer{margin-top:76px;background:var(--navy);color:#B9CBDE;padding:44px 0 38px;font-size:14px}
+  footer .cols{display:flex;gap:44px;flex-wrap:wrap;justify-content:space-between}
+  footer a{color:#DCE7F3} footer .dim{color:#7E97B0}
+  .road{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .road span{background:#fff;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:7px 16px;font-size:13.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top"><img src="img/mark-512.png" alt="LeanFile">LeanFile</a>
+    <nav class="links">
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#how" data-i18n="nav.how">How it works</a>
+      <a href="#bench" data-i18n="nav.bench">Benchmarks</a>
+      <a href="#open" data-i18n="nav.open">Open core</a>
+    </nav>
+    <div class="sp"></div>
+    <div class="langbtn">
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+      <button id="btn-zh" onclick="setLang('zh')">中文</button>
+    </div>
+    <a class="ghbtn" href="https://github.com/sky791016/LeanFile">GitHub</a>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <img class="icon" src="img/app-icon-1024.png" alt="LeanFile app icon">
+    <h1>LeanFile</h1>
+    <p class="tag" data-i18n="hero.tag">Every file your AI makes — gathered, deduplicated, organized by conversation, and findable in milliseconds.</p>
+    <p class="sub" data-i18n="hero.sub">AI tools produce drafts, variants, renders and shards faster than any folder system can absorb. LeanFile is the asset layer that sits on top of your files and quietly keeps them in order.</p>
+    <div class="cta">
+      <a class="btn gold" href="https://github.com/sky791016/LeanFile" data-i18n="hero.cta1">View on GitHub</a>
+      <a class="btn ghost" href="#start" data-i18n="hero.cta2">Quick start</a>
+    </div>
+    <div class="chips">
+      <span class="chip"><b>~13k</b> <span data-i18n="chip.ingest">files/s ingest</span></span>
+      <span class="chip"><b>0.5–6 ms</b> <span data-i18n="chip.search">full-text search</span></span>
+      <span class="chip"><b>100%</b> <span data-i18n="chip.precision">variant-clustering precision</span></span>
+      <span class="chip"><b>Apache 2.0</b> <span data-i18n="chip.license">open-source core</span></span>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <h2 data-i18n="feat.title">Seven outcomes, not process data</h2>
+    <p class="lede" data-i18n="feat.lede">Users don't care about version graphs. They care that things just work:</p>
+    <div class="grid">
+      <div class="card"><div class="n">1</div><h3 data-i18n="f1.t">Duplicates disappear</h3><p data-i18n="f1.d">Identical content keeps one best copy; extras are quarantined — never hard-deleted — and restorable in one click.</p></div>
+      <div class="card"><div class="n">2</div><h3 data-i18n="f2.t">Files classify themselves</h3><p data-i18n="f2.d">Every file gets a category and an importance class: protected, keep, or ephemeral.</p></div>
+      <div class="card"><div class="n">3</div><h3 data-i18n="f3.t">Search that finds things</h3><p data-i18n="f3.d">Full-text search over document bodies (SQLite FTS5) — millisecond answers across tens of thousands of files.</p></div>
+      <div class="card"><div class="n">4</div><h3 data-i18n="f4.t">Important files can't be lost</h3><p data-i18n="f4.d">Protected files are monitored for single-copy risk; one click makes a hash-verified second copy on another location.</p></div>
+      <div class="card"><div class="n">5</div><h3 data-i18n="f5.t">Junk expires by rule</h3><p data-i18n="f5.d">You switch the rules on; LeanFile executes them — always via quarantine first, always logged, always reversible.</p></div>
+      <div class="card"><div class="n">6</div><h3 data-i18n="f6.t">Conversations pack for handover</h3><p data-i18n="f6.d">One click bundles what a conversation produced — each file's best version — into a clean folder with a manifest.</p></div>
+      <div class="card"><div class="n">7</div><h3 data-i18n="f7.t">Shards become visible</h3><p data-i18n="f7.d">Part files and sequence splits that are really one whole are detected and listed as groups, ready to be reunited.</p></div>
+      <div class="card"><div class="n">✓</div><h3 data-i18n="f8.t">A safety contract</h3><p data-i18n="f8.d">Automation never hard-deletes. The last copy of anything, the current version, and finals are untouchable by cleanup rules. Inferred data is labeled inferred — never presented as fact.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap split">
+    <div>
+      <h2 data-i18n="how.title">Organized by conversation</h2>
+      <p class="lede" data-i18n="how.lede">You remember a file by the chat that produced it — not by its folder.</p>
+      <p data-i18n="how.p1">LeanFile organizes files under the LLM conversation or work session that created them. Registrations carry conversation metadata (tool, model, title); legacy files are reconstructed into sessions by project folder + time-window analysis — honestly labeled inferred.</p>
+      <p data-i18n="how.p2">The macOS app opens on a dashboard: totals, capacity, category and type breakdowns, production by day. Click any number and the matching files are right there — as a list, or as a preview-thumbnail grid.</p>
+    </div>
+    <div class="mock">
+      <div class="row"><span data-i18n="mock.files">Files</span><b>2,056</b></div>
+      <div class="row"><span data-i18n="mock.space">Space</span><b>8.37 GB</b></div>
+      <div class="row"><span data-i18n="mock.convs">Conversations</span><b>224</b></div>
+      <div class="row"><span data-i18n="mock.finals">Finals</span><b class="g">✓</b></div>
+      <div class="row"><span data-i18n="mock.risk">Important, single-copy</span><b class="g">21 → 0</b></div>
+      <div class="row"><span data-i18n="mock.reclaim">Reclaimable duplicates</span><b>12.5 MB</b></div>
+    </div>
+  </div>
+</section>
+
+<section id="bench">
+  <div class="wrap">
+    <h2 data-i18n="bench.title">Measured, not promised</h2>
+    <p class="lede" data-i18n="bench.lede">Engine benchmarks on a synthetic fragmented corpus — 25,325 files: variant groups, duplicate pairs, shard sets, and noise.</p>
+    <table>
+      <tr><th data-i18n="bench.h1">Operation</th><th data-i18n="bench.h2">Result</th></tr>
+      <tr><td data-i18n="bench.r1">Ingest 25,325 files</td><td><b>≈ 2 s</b> <span data-i18n="bench.r1b">(~13k files/s, parallel hashing)</span></td></tr>
+      <tr><td data-i18n="bench.r2">Incremental rescan</td><td><b>0.4 s</b></td></tr>
+      <tr><td data-i18n="bench.r3">Duplicate detection</td><td><b>375 / 375</b></td></tr>
+      <tr><td data-i18n="bench.r4">Variant clustering</td><td><b>99.6%</b> <span data-i18n="bench.r4b">recall at</span> <b>100%</b> <span data-i18n="bench.r4c">precision (SimHash + Jaccard)</span></td></tr>
+      <tr><td data-i18n="bench.r5">Shard-group detection</td><td><b>150 / 150</b></td></tr>
+      <tr><td data-i18n="bench.r6">Full-text query</td><td><b>0.5–6 ms</b></td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="arch">
+  <div class="wrap">
+    <h2 data-i18n="arch.title">How it's built</h2>
+    <p class="lede" data-i18n="arch.lede">A platform-independent engine, a native shell, and compute that stays local first.</p>
+    <div class="arch">
+      <div class="card"><h3 data-i18n="a1.t">Core engine · Python</h3><p data-i18n="a1.d">Content-hash identity (SHA-256), sidecar manifest protocol, version chains, state machine, dedup, near-duplicate clustering, FTS5 indexing, storage-node replication, autopilot rules.</p></div>
+      <div class="card"><h3 data-i18n="a2.t">macOS app · SwiftUI</h3><p data-i18n="a2.d">Resident, launch-at-login, Finder-companion UI on the same SQLite registry. All database work runs off the main thread. UI follows your system language.</p></div>
+      <div class="card"><h3 data-i18n="a3.t">Compute tiers</h3><p data-i18n="a3.d">Local algorithms first, local models or your own endpoints next, optional official cloud last — every run records which tier did the work and what it cost.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="open">
+  <div class="wrap">
+    <h2 data-i18n="open.title">Open core, honestly</h2>
+    <p class="lede" data-i18n="open.lede">The local core is open source under Apache 2.0 — full-featured, forever. The official cloud is an optional add-on for people without local compute: hosted processing, sync & backup, team collaboration. Your files stay exportable, stopping payment never touches your assets, and cloud processing never trains on your data.</p>
+    <div class="road">
+      <span data-i18n="road.1">Roadmap: resident helper (FSEvents + APFS snapshots)</span>
+      <span data-i18n="road.2">Roadmap: photo/video near-duplicate detection</span>
+      <span data-i18n="road.3">Roadmap: semantic “describe it” search</span>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <h2 data-i18n="start.title">Quick start</h2>
+    <p class="lede" data-i18n="start.lede">The engine is a Python CLI today; the macOS app builds with only the Command Line Tools.</p>
+    <pre>python3 -m guicang.cli --db leanfile.db node-add mac ~/Documents --kind local
+python3 -m guicang.cli --db leanfile.db scan mac
+python3 -m guicang.cli --db leanfile.db build-previews
+python3 -m guicang.cli --db leanfile.db conversations      <span class="c"># files by conversation</span>
+python3 -m guicang.cli --db leanfile.db bundle --latest    <span class="c"># pack for handover</span>
+python3 -m guicang.cli --db leanfile.db protect-run --yes  <span class="c"># back up the important ones</span>
+
+<span class="c"># macOS app</span>
+cd macos &amp;&amp; ./build.sh &amp;&amp; open build/Guicang.app</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap cols">
+    <div>
+      <img src="img/logo-horizontal-reversed.png" alt="LeanFile" style="height:44px">
+      <p class="dim" data-i18n="foot.family">Part of the Lean family by Kai Shi — Lean Data Methodology · Lean AI · LeanFDE.</p>
+    </div>
+    <div>
+      <p><a href="https://github.com/sky791016/LeanFile">GitHub</a> · <a href="https://github.com/sky791016/LeanFile/blob/main/README.zh-CN.md">中文 README</a> · <a href="https://github.com/sky791016/LeanFile/blob/main/LICENSE">Apache 2.0</a></p>
+      <p class="dim">© 2026 Kai Shi (Sky). <span data-i18n="foot.note">Internal codename: guicang.</span></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+const I18N = {
+  zh: {
+    "nav.features":"功能","nav.how":"原理","nav.bench":"性能实测","nav.open":"开源与云",
+    "hero.tag":"你的 AI 生成的每一个文件——自动汇聚、自动去重、按对话组织、毫秒级找回。",
+    "hero.sub":"AI 工具生产草稿、变体、渲染稿和分片的速度，已经超过任何文件夹体系能承受的程度。LeanFile 是位于你的文件之上的一层资产层，安静地把它们管起来。",
+    "hero.cta1":"在 GitHub 查看","hero.cta2":"快速开始",
+    "chip.ingest":"文件/秒 摄入","chip.search":"全文检索","chip.precision":"变体聚类精度","chip.license":"开源核心",
+    "feat.title":"只要七个结果，不要过程数据",
+    "feat.lede":"用户不关心版本图，只关心事情是否就这么办妥了：",
+    "f1.t":"重复自动消失","f1.d":"相同内容只留最佳一份；多余副本进隔离区——永不硬删——一键可恢复。",
+    "f2.t":"文件自动分类","f2.d":"每个文件都有类别和重要度三档：重要、保留、临时。",
+    "f3.t":"搜索真的找得到","f3.d":"对文档正文做全文检索（SQLite FTS5）——万级文件量下，毫秒级返回。",
+    "f4.t":"重要文件丢不了","f4.d":"重要文件被持续监测单副本风险；点一下，就在第二个位置生成一份逐个验哈希的副本。",
+    "f5.t":"垃圾按规则过期","f5.d":"规则由你开关，LeanFile 负责执行——永远先隔离、永远有日志、永远可恢复。",
+    "f6.t":"对话一键打包交付","f6.d":"把某次对话产出的每个文件的最佳版本，打包成一个干净文件夹，附清单，拿来就能发人。",
+    "f7.t":"碎片看得见","f7.d":"本是一体的分片文件与序列分片被识别成组列出，随时可以拼回。",
+    "f8.t":"一条安全契约","f8.d":"自动化永不硬删任何文件。任何文件的最后一个副本、当前版本、正式版，清理规则一律碰不得。推断得出的信息处处标注“推断”，不冒充事实。",
+    "how.title":"按对话组织",
+    "how.lede":"你回想一个文件，想的是“哪次对话产出的”，不是它在哪个文件夹。",
+    "how.p1":"LeanFile 按产生文件的那次大模型对话 / 工作会话组织文件：登记携带对话元数据（工具、模型、标题）；存量文件按“项目目录 + 时间窗”重建会话——并如实标注为推断归组。",
+    "how.p2":"macOS 应用打开就是总览：文件总数、占用空间、分类与类型构成、按日产出。点任意数字，对应的文件就在右侧——列表视图，或预览图网格。",
+    "mock.files":"文件总数","mock.space":"占用空间","mock.convs":"对话数","mock.finals":"正式版","mock.risk":"重要文件·仅一份","mock.reclaim":"可回收重复",
+    "bench.title":"实测，不许诺",
+    "bench.lede":"引擎在合成碎片语料上的成绩——25,325 个文件：变体组、重复对、分片组与噪声。",
+    "bench.h1":"操作","bench.h2":"结果",
+    "bench.r1":"摄入 25,325 个文件","bench.r1b":"（并行哈希，约 1.3 万文件/秒）",
+    "bench.r2":"增量重扫","bench.r3":"重复检出","bench.r4":"变体聚类","bench.r4b":"召回，精度","bench.r4c":"（SimHash + Jaccard）",
+    "bench.r5":"分片组识别","bench.r6":"全文检索查询",
+    "arch.title":"它是怎么造的",
+    "arch.lede":"一个跨平台引擎、一个原生外壳，算力永远本地优先。",
+    "a1.t":"核心引擎 · Python","a1.d":"内容哈希身份（SHA-256）、sidecar 清单协议、版本链、状态机、去重、近似重复聚类、FTS5 索引、存放位置复制、自动规则引擎。",
+    "a2.t":"macOS 应用 · SwiftUI","a2.d":"常驻、开机自启，与引擎共用同一个 SQLite 登记库；所有数据库操作走后台队列，界面不卡。界面语言跟随系统。",
+    "a3.t":"算力分层","a3.d":"本地算法优先，其次本地模型或自备端点，最后才是可选官方云——每次运行都记录用了哪层算力、花了多少。",
+    "open.title":"Open Core，讲实话",
+    "open.lede":"本地核心以 Apache 2.0 开源——功能完整、永久免费。官方云是给没有本地算力的人的可选增值：托管算力、同步备份、团队协作。你的文件永远可全量导出；停付不影响任何已有文件；云端处理绝不拿你的数据训练。",
+    "road.1":"路线图：常驻守护进程（FSEvents + APFS 快照留版）","road.2":"路线图：图片/视频近似去重","road.3":"路线图：语义“说人话”找回",
+    "start.title":"快速开始",
+    "start.lede":"引擎今天是一个 Python CLI；macOS 应用只需 Command Line Tools 即可构建。",
+    "foot.family":"史凯（Kai Shi）的 Lean 家族一员——《精益数据方法论》· Lean AI · LeanFDE。",
+    "foot.note":"内部代号：guicang。"
+  }
+};
+function setLang(l){
+  document.documentElement.lang = (l === 'zh') ? 'zh-CN' : 'en';
+  document.getElementById('btn-en').classList.toggle('on', l === 'en');
+  document.getElementById('btn-zh').classList.toggle('on', l === 'zh');
+  if(l === 'zh'){
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      if(!el.dataset.en) el.dataset.en = el.innerHTML;
+      if(I18N.zh[k]) el.innerHTML = I18N.zh[k];
+    });
+    document.title = 'LeanFile — macOS 上的 AI 文件资产层';
+  } else {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      if(el.dataset.en) el.innerHTML = el.dataset.en;
+    });
+    document.title = 'LeanFile — The AI file asset layer for macOS';
+  }
+  try{ localStorage.setItem('leanfile-lang', l); }catch(e){}
+}
+(function(){
+  let l = null;
+  try{ l = localStorage.getItem('leanfile-lang'); }catch(e){}
+  if(!l) l = (navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  setLang(l);
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,26 @@
-# LeanFile
+<p align="center">
+  <img src="brand/app-icon-1024.png" width="128" alt="LeanFile app icon">
+</p>
 
-**Every file your AI makes — gathered, deduplicated, organized by conversation, and findable in milliseconds.**
+<h1 align="center">LeanFile</h1>
+
+<p align="center">
+  <strong>Every file your AI makes — gathered, deduplicated, organized by conversation, and findable in milliseconds.</strong>
+</p>
+
+<p align="center">
+  <a href="README.zh-CN.md">简体中文</a> ·
+  <a href="https://sky791016.github.io/LeanFile/">Portal</a> ·
+  <a href="#quick-start-engine-cli">Quick start</a> ·
+  <a href="LICENSE">License</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License: Apache 2.0">
+  <img src="https://img.shields.io/badge/platform-macOS%2014%2B-0B2B4B" alt="Platform: macOS 14+">
+  <img src="https://img.shields.io/badge/core-Python%203-3776AB" alt="Core: Python 3">
+  <img src="https://img.shields.io/badge/UI-SwiftUI-orange" alt="UI: SwiftUI">
+</p>
 
 AI tools now produce files faster than any folder system can absorb:
 drafts, variants, renders, shards — thousands of near-identical files
@@ -75,7 +95,8 @@ FTS queries 0.5–6 ms. See `BENCH-20261022.md`.
 ## Quick start (engine CLI)
 
 ```bash
-python3 -m guicang.cli --db leanfile.db scan-node --name mac --path ~/Documents --kind local
+python3 -m guicang.cli --db leanfile.db node-add mac ~/Documents --kind local
+python3 -m guicang.cli --db leanfile.db scan mac
 python3 -m guicang.cli --db leanfile.db build-previews
 python3 -m guicang.cli --db leanfile.db infer-batches
 python3 -m guicang.cli --db leanfile.db conversations
@@ -110,11 +131,4 @@ Apache License 2.0 — see `LICENSE`.
 
 ---
 
-## 中文简介
-
-LeanFile 是 macOS 上的 AI 文件资产层：为大模型时代“碎片化的大规模
-文件生产”而建。自动去重、自动分类、全文检索、重要文件多副本保护、
-过程文件按规则过期清理；文件按“产生它的那次对话”组织；总览仪表盘
-下钻到任意类别的清单（列表/预览图双视图）。本地核心开源免费
-（Apache 2.0），智能算力本地优先，无本地算力的用户可选用官方云
-增值服务。
+**中文版**：[README.zh-CN.md](README.zh-CN.md) · **门户网站**：[sky791016.github.io/LeanFile](https://sky791016.github.io/LeanFile/)
