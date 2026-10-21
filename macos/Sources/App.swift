@@ -27,6 +27,11 @@ struct MM1031App: App {
         }
         .windowStyle(.titleBar)
 
+        Settings {
+            SettingsView()
+                .environmentObject(store)
+        }
+
         MenuBarExtra("LeanFile", systemImage: "archivebox.fill") {
             Button(L.t("menu.open")) {
                 NSApp.activate(ignoringOtherApps: true)
@@ -242,6 +247,26 @@ final class Store: ObservableObject {
         reload()
     }
 
+    /// Load rule settings + cleanup preview for the Settings window,
+    /// which can be opened without visiting the rules section.
+    func refreshRules() {
+        queue.async { [weak self] in
+            guard let self, let db = self.db else { return }
+            var merged = [
+                "stale_versions_enabled": "0", "stale_versions_days": "30",
+                "dedup_enabled": "0", "ephemeral_enabled": "0",
+                "quarantine_retention_days": "30",
+            ]
+            for (k, v) in db.settings() { merged[k] = v }
+            let preview = db.cleanupPreview(
+                staleDays: Int(merged["stale_versions_days"] ?? "30") ?? 30)
+            DispatchQueue.main.async {
+                self.rules = merged
+                self.cleanupPreview = preview
+            }
+        }
+    }
+
     func openDrill(title: String, category: String? = nil, type: String? = nil,
                    protect: Bool = false, finals: Bool = false) {
         drillTitle = title
@@ -416,12 +441,18 @@ struct ContentView: View {
                     SidebarView(badge: badge)
                 } content: {
                     contentColumn
+                        .navigationSplitViewColumnWidth(
+                            min: 320, ideal: 430, max: 600)
                 } detail: {
-                    if store.detailShowsDrill {
-                        DrillView()
-                    } else {
-                        inspector
+                    Group {
+                        if store.detailShowsDrill {
+                            DrillView()
+                        } else {
+                            inspector
+                        }
                     }
+                    .navigationSplitViewColumnWidth(
+                        min: 280, ideal: 380, max: 560)
                 }
             }
         }
@@ -1128,8 +1159,6 @@ struct DrillTile: View {
 // MARK: - About the author
 
 struct AboutView: View {
-    @EnvironmentObject var store: Store
-    @AppStorage("mm1031.lang") private var langPref = ""
 
     private var feedbackURL: URL {
         var c = URLComponents(string: "mailto:sky.kugua@gmail.com")!
@@ -1150,16 +1179,6 @@ struct AboutView: View {
 
     var body: some View {
         Form {
-            SwiftUI.Section("语言 Language") {
-                Picker("语言 Language", selection: $langPref) {
-                    Text("跟随系统 System").tag("")
-                    Text("中文").tag("zh")
-                    Text("English").tag("en")
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .onChange(of: langPref) { _, _ in store.langTick += 1 }
-            }
             SwiftUI.Section {
                 HStack(spacing: 16) {
                     Image(nsImage: NSApplication.shared.applicationIconImage)
@@ -1277,7 +1296,7 @@ enum AdService {
                 titleZh: "赞助位招租", titleEn: "Your product here",
                 textZh: "这个位置也可以是你的产品——赞助 LeanFile，触达 AI 文件管理用户。",
                 textEn: "This slot can carry your product — sponsor LeanFile and reach AI-era file users.",
-                url: "mailto:sky.kugua@gmail.com"),
+                url: "https://sky791016.github.io/LeanFile/#advertise"),
     ]
 
     static func fetchRemote(_ done: @escaping ([AdEntry]) -> Void) {
@@ -1354,6 +1373,7 @@ struct AdCard: View {
 struct SidebarView: View {
     @EnvironmentObject var store: Store
     let badge: (Section) -> Int
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -1372,7 +1392,7 @@ struct SidebarView: View {
             .padding(.bottom, 10)
 
             VStack(spacing: 2) {
-                ForEach(Section.allCases) { s in
+                ForEach(Section.allCases.filter { $0 != .rules }) { s in
                     Button { store.select(section: s) } label: {
                         HStack(spacing: 9) {
                             Image(systemName: s.icon).frame(width: 18)
@@ -1410,6 +1430,24 @@ struct SidebarView: View {
             .padding(.horizontal, 10)
 
             Spacer()
+            // PERMANENT settings entry: hard-wired into the sidebar.
+            // No setting may hide it — if it could disappear, the user
+            // would have no way back into Settings.
+            Button { openSettings() } label: {
+                HStack(spacing: 9) {
+                    Image(systemName: "gearshape").frame(width: 18)
+                    Text(L.t("settings.title")).font(.subheadline)
+                    Spacer()
+                    Text("⌘,")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.45))
+                }
+                .foregroundStyle(.white.opacity(0.88))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
             AdCard().padding(.horizontal, 10)
             Text("v0.1.0")
                 .font(.caption2)
@@ -1418,6 +1456,52 @@ struct SidebarView: View {
         }
         .background(navyGradient)
         .navigationSplitViewColumnWidth(min: 200, ideal: 220)
+    }
+}
+
+// MARK: - Settings window
+
+struct SettingsView: View {
+    @EnvironmentObject var store: Store
+
+    var body: some View {
+        TabView {
+            GeneralSettingsView()
+                .tabItem {
+                    Label(L.t("settings.general"), systemImage: "gearshape")
+                }
+            RulesView()
+                .tabItem {
+                    Label(L.t("section.rules"),
+                          systemImage: "slider.horizontal.3")
+                }
+        }
+        .frame(width: 580, height: 500)
+        .onAppear { store.refreshRules() }
+    }
+}
+
+struct GeneralSettingsView: View {
+    @EnvironmentObject var store: Store
+    @AppStorage("mm1031.lang") private var langPref = ""
+
+    var body: some View {
+        Form {
+            SwiftUI.Section("语言 Language") {
+                Picker("语言 Language", selection: $langPref) {
+                    Text("跟随系统 System").tag("")
+                    Text("中文").tag("zh")
+                    Text("English").tag("en")
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .onChange(of: langPref) { _, _ in store.langTick += 1 }
+            }
+            SwiftUI.Section {
+                LabeledContent("LeanFile", value: "v0.1.0 · MM1031")
+            }
+        }
+        .formStyle(.grouped)
     }
 }
 
@@ -1466,6 +1550,19 @@ private enum SelfShot {
         await wait(1.5); snap("shot-about.png")
         store.select(section: .rules)
         await wait(1.5); snap("shot-rules.png")
+        let mainWin = NSApp.windows.first(where: { $0.contentView != nil })
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        await wait(1.4)
+        if let sw = NSApp.windows.first(where: {
+               $0 != mainWin && $0.contentView != nil
+               && $0.frame.width > 400 && $0.frame.width < 900 }),
+           let view = sw.contentView,
+           let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) {
+            view.cacheDisplay(in: view.bounds, to: rep)
+            if let data = rep.representation(using: .png, properties: [:]) {
+                try? data.write(to: URL(fileURLWithPath: dir + "/shot-settings.png"))
+            }
+        }
         store.select(section: .dashboard)
     }
 }

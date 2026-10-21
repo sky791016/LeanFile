@@ -1,22 +1,42 @@
 [
-  {"id": "book", "icon": "book.closed.fill", "tint": "blue",
-   "titleZh": "《精益数据方法论》", "titleEn": "Lean Data Discovery",
-   "textZh": "英文版由 Springer Nature 全球出版——数据驱动的数字化转型方法论。",
-   "textEn": "The Lean Data Methodology, published worldwide by Springer Nature.",
-   "url": "https://leanvalue.online"},
-  {"id": "course", "icon": "graduationcap.fill", "tint": "cyan",
-   "titleZh": "凯哥讲 AI · LeanFDE", "titleEn": "Kai Talks AI · LeanFDE",
-   "textZh": "从 AI Native 到 Value Native：FDE 落地方法与课程。",
-   "textEn": "From AI Native to Value Native — the FDE playbook and courses.",
-   "url": "https://leanvalue.online"},
-  {"id": "cloud", "icon": "cloud.fill", "tint": "gold",
-   "titleZh": "LeanFile 官方云", "titleEn": "LeanFile Cloud",
-   "textZh": "同步、备份、团队协作——增值云服务即将上线，敬请期待。",
-   "textEn": "Sync, backup and team collaboration — the official cloud is coming soon.",
-   "url": "https://sky791016.github.io/LeanFile/#cloud"},
-  {"id": "sponsor", "icon": "megaphone.fill", "tint": "green",
-   "titleZh": "赞助位招租", "titleEn": "Your product here",
-   "textZh": "这个位置也可以是你的产品——赞助 LeanFile，触达 AI 文件管理用户。",
-   "textEn": "This slot can carry your product — sponsor LeanFile and reach AI-era file users.",
-   "url": "mailto:sky.kugua@gmail.com"}
+  {
+    "id": "book",
+    "icon": "book.closed.fill",
+    "tint": "blue",
+    "titleZh": "《精益数据方法论》",
+    "titleEn": "Lean Data Discovery",
+    "textZh": "英文版由 Springer Nature 全球出版——数据驱动的数字化转型方法论。",
+    "textEn": "The Lean Data Methodology, published worldwide by Springer Nature.",
+    "url": "https://leanvalue.online"
+  },
+  {
+    "id": "course",
+    "icon": "graduationcap.fill",
+    "tint": "cyan",
+    "titleZh": "凯哥讲 AI · LeanFDE",
+    "titleEn": "Kai Talks AI · LeanFDE",
+    "textZh": "从 AI Native 到 Value Native：FDE 落地方法与课程。",
+    "textEn": "From AI Native to Value Native — the FDE playbook and courses.",
+    "url": "https://leanvalue.online"
+  },
+  {
+    "id": "cloud",
+    "icon": "cloud.fill",
+    "tint": "gold",
+    "titleZh": "LeanFile 官方云",
+    "titleEn": "LeanFile Cloud",
+    "textZh": "同步、备份、团队协作——增值云服务即将上线，敬请期待。",
+    "textEn": "Sync, backup and team collaboration — the official cloud is coming soon.",
+    "url": "https://sky791016.github.io/LeanFile/#cloud"
+  },
+  {
+    "id": "sponsor",
+    "icon": "megaphone.fill",
+    "tint": "green",
+    "titleZh": "赞助位招租",
+    "titleEn": "Your product here",
+    "textZh": "这个位置也可以是你的产品——赞助 LeanFile，触达 AI 文件管理用户。",
+    "textEn": "This slot can carry your product — sponsor LeanFile and reach AI-era file users.",
+    "url": "https://sky791016.github.io/LeanFile/#advertise"
+  }
 ]

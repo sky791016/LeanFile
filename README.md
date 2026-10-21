@@ -171,6 +171,20 @@ Real captures from the running app (the first user's live registry:
 ![Auto rules](docs/img/shots/en/pub-rules.png)
 *Auto rules — off by default; you switch on what LeanFile may do.*
 
+## What's new in the app
+
+- **Settings window (⌘,)**: language (System / 中文 / English) and all
+  auto rules in one place. The gear button that opens it lives
+  permanently in the sidebar — it can never be hidden away.
+- **A tech reskin**: navy brand sidebar, dashboard brand band, stat
+  cards with icon chips, gradient breakdown bars, a navy author card.
+- **Sidebar ad card**: a small, labeled, closable card in the
+  bottom-left, remote-configured from `docs/ads.json` — house ads and
+  a sponsor slot today; advertisers onboard by email (see the site's
+  Advertise section), live within 24 hours, no app update needed.
+- **Installer**: [LeanFile-0.1.0.pkg](https://github.com/sky791016/LeanFile/releases/download/v0.1.0/LeanFile-0.1.0.pkg)
+  installs the app to /Applications and registers login auto-start.
+
 ## Architecture
 
 - **Core engine (Python, platform-independent)** — content-hash

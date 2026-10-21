@@ -174,7 +174,9 @@
 
 <section id="shots">
   <div class="wrap">
-    <h2 data-i18n="sponsor.title":"赞助 LeanFile","sponsor.lede":"LeanFile 免费开源，由史凯（Kai Shi）开发。如果它帮你找回过哪怕一个文件，请他喝杯咖啡就是最好的支持——两档任选，支付方式陆续开通：","sponsor.usd.p":"一次性赞助，美元。","sponsor.cny.p":"一次性赞助，人民币。","sponsor.btn":"通过 GitHub 赞助","sponsor.more.t":"更多方式，陆续开通","sponsor.more.p":"GitHub Sponsors 先行；Stripe、微信支付、支付宝的直接付款链接将在各自通道开通后出现在这里。点赞也有用——它告诉下一个人：这个工具是真的。","sponsor.star":"给仓库点 Star",
+    <h2 data-i18n="start.dl":"下载安装包（.pkg）",
+    "adv.title":"广告合作","adv.lede":"你的产品，出现在每一位 LeanFile 用户窗口的左下角——一张用户干活时真的会看到的小卡片，明码标注广告，可以关掉，永不弹窗。","adv.c1t":"广告位","adv.c1p":"侧栏卡片，18 秒轮换，全体用户可见。标注「广告」，一键隐藏（本次会话）。没有跟踪像素，没有小动作。","adv.c2t":"规格","adv.c2p":"标题 14 字以内，文案 50 字以内，一个落地链接，一个图标和配色。你发文字，剩下的我们来。","adv.c3t":"首发合作价","adv.c3p":"早期合作伙伴价格：体验周 ¥99，标准月 ¥499，季度 ¥1,299。早期用户，早期价格。","adv.how":"怎么接入：1）发邮件给品牌、标题、文案、链接和投放周期；2）一天内审核——误导性和灰产产品不接；3）微信或支付宝付款，24 小时内通过远程配置上线，不用等应用发版。现阶段用户量处于早期，你买的是 crowd 之前的价格。","adv.btn":"发邮件申请",
+    "sponsor.title":"赞助 LeanFile","sponsor.lede":"LeanFile 免费开源，由史凯（Kai Shi）开发。如果它帮你找回过哪怕一个文件，请他喝杯咖啡就是最好的支持——两档任选，支付方式陆续开通：","sponsor.usd.p":"一次性赞助，美元。","sponsor.cny.p":"一次性赞助，人民币。","sponsor.btn":"通过 GitHub 赞助","sponsor.more.t":"更多方式，陆续开通","sponsor.more.p":"GitHub Sponsors 先行；Stripe、微信支付、支付宝的直接付款链接将在各自通道开通后出现在这里。点赞也有用——它告诉下一个人：这个工具是真的。","sponsor.star":"给仓库点 Star",
     "shots.title">The real thing</h2>
     <p class="lede" data-i18n="shots.lede">Screenshots from the running app, on its first user's live registry — 2,056 files:</p>
     <div class="shots">
@@ -240,6 +242,20 @@
   </div>
 </section>
 
+<section id="advertise">
+  <div class="wrap">
+    <h2 data-i18n="adv.title">Advertise with LeanFile</h2>
+    <p class="lede" data-i18n="adv.lede">Your product, in the bottom-left of every LeanFile window — a small card users actually see while they work, honestly labeled, closable, never a pop-up.</p>
+    <div class="cards">
+      <div class="card"><h3 data-i18n="adv.c1t">The slot</h3><p data-i18n="adv.c1p">Sidebar card, 18-second rotation, shown to every user. Labeled AD, one-click to hide for the session. No tracking pixels, no funny business.</p></div>
+      <div class="card"><h3 data-i18n="adv.c2t">Specs</h3><p data-i18n="adv.c2p">Title up to 14 characters, text up to 50, one landing URL, an icon and accent color. You send words; we handle the rest.</p></div>
+      <div class="card"><h3 data-i18n="adv.c3t">Launch pricing</h3><p data-i18n="adv.c3p">Early-partner rates: ¥99 for a trial week, ¥499 per month, ¥1,299 per quarter. Early audience, early prices.</p></div>
+    </div>
+    <p class="lede" data-i18n="adv.how">How it works: 1) Email your brand, title, text, URL and dates. 2) We review within a day — no misleading or gray-area products. 3) Pay by WeChat or Alipay; your card goes live within 24 hours via remote config — no app update needed. Audience is early-stage: you are buying in before the crowd.</p>
+    <p><a class="btn" href="mailto:sky.kugua@gmail.com?subject=LeanFile%20%E5%B9%BF%E5%91%8A%E5%90%88%E4%BD%9C%20%2F%20Advertising&body=%E5%93%81%E7%89%8C%EF%BC%9A%0A%E6%A0%87%E9%A2%98%EF%BC%88%E2%89%A414%E5%AD%97%EF%BC%89%EF%BC%9A%0A%E6%96%87%E6%A1%88%EF%BC%88%E2%89%A450%E5%AD%97%EF%BC%89%EF%BC%9A%0A%E8%90%BD%E5%9C%B0%E9%93%BE%E6%8E%A5%EF%BC%9A%0A%E6%8A%95%E6%94%BE%E5%91%A8%E6%9C%9F%EF%BC%9A" data-i18n="adv.btn">Apply by email</a></p>
+  </div>
+</section>
+
 <section id="start">
   <div class="wrap">
     <h2 data-i18n="start.title">Quick start</h2>
@@ -253,6 +269,7 @@ python3 -m mm1031.cli --db leanfile.db protect-run --yes  <span class="c"># back
 
 <span class="c"># macOS app</span>
 cd macos &amp;&amp; ./build.sh &amp;&amp; open build/LeanFile.app</pre>
+    <p><a class="btn" href="https://github.com/sky791016/LeanFile/releases/download/v0.1.0/LeanFile-0.1.0.pkg" data-i18n="start.dl">Download the installer (.pkg)</a></p>
   </div>
 </section>
 
