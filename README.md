@@ -54,6 +54,38 @@ Users don't care about version graphs. They care that:
    one whole (part files, sequence splits) are detected and listed as
    groups, so pieces can be reunited instead of scattered.
 
+## Scenarios — ten everyday messes
+
+1. **The article with twelve “final” versions.** A piece is revised
+   with an AI again and again — draft_v1 … final_FINAL_v12. LeanFile
+   keeps exactly one Final; every earlier take stays one click away.
+2. **Video production chaos.** A seven-minute film means hundreds of
+   clips, voice takes and renders. Shard groups reunite split takes;
+   one click bundles the whole conversation for delivery.
+3. **Client deliverables.** A proposal deck revised across weeks of
+   meetings. The Final is unambiguous — and the bundle is exactly
+   what the client receives.
+4. **AI pair-programming sprawl.** Two AI coding tools edit the same
+   project. Process files expire by rule; real code stays classified
+   and searchable.
+5. **Data-analysis runs.** One analysis spawns forty CSVs and charts.
+   Categories file them automatically; full-text search finds the one
+   table with the answer.
+6. **The book manuscript.** Chapters polished by AI over and over —
+   the version chain stays legible, and any chapter's latest draft
+   packs in one click.
+7. **Bid & proposal war-room.** Dozens of attachments, many hands, a
+   hard deadline. One Final per document, and a single-copy alarm on
+   the files that matter.
+8. **AI image batches.** One prompt, twenty variants. The
+   preview-thumbnail grid replaces Finder roulette; duplicates vanish.
+9. **Family media vault.** Phone and drone footage across a laptop, a
+   desktop and a NAS — registered in one place, with verified second
+   copies for the irreplaceable originals.
+10. **The 3 a.m. “where is that file?”** Something you half-remember
+    from a chat last month: search by what it says, or open the
+    conversation that made it. Milliseconds, not an evening of digging.
+
 ## Organized by conversation
 
 You remember a file by *the chat that produced it*, not by its folder.

@@ -76,6 +76,7 @@
     <a class="brand" href="#top"><img src="img/mark-512.png" alt="LeanFile">LeanFile</a>
     <nav class="links">
       <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#scenarios" data-i18n="nav.scen">Scenarios</a>
       <a href="#how" data-i18n="nav.how">How it works</a>
       <a href="#bench" data-i18n="nav.bench">Benchmarks</a>
       <a href="#open" data-i18n="nav.open">Open core</a>
@@ -125,6 +126,24 @@
   </div>
 </section>
 
+<section id="scenarios">
+  <div class="wrap">
+    <h2 data-i18n="scen.title">Ten everyday messes</h2>
+    <p class="lede" data-i18n="scen.lede">Where LeanFile earns its keep — the situations its first user actually lives in:</p>
+    <div class="grid">
+      <div class="card"><div class="n">1</div><h3 data-i18n="s1.t">The article with twelve “final” versions</h3><p data-i18n="s1.d">Revised with an AI again and again — draft_v1 … final_FINAL_v12. LeanFile keeps exactly one Final; every earlier take stays one click away.</p></div>
+      <div class="card"><div class="n">2</div><h3 data-i18n="s2.t">Video production chaos</h3><p data-i18n="s2.d">A seven-minute film means hundreds of clips, voice takes and renders. Shard groups reunite split takes; one click bundles the whole conversation for delivery.</p></div>
+      <div class="card"><div class="n">3</div><h3 data-i18n="s3.t">Client deliverables</h3><p data-i18n="s3.d">A proposal deck revised across weeks of meetings. The Final is unambiguous — and the bundle is exactly what the client receives.</p></div>
+      <div class="card"><div class="n">4</div><h3 data-i18n="s4.t">AI pair-programming sprawl</h3><p data-i18n="s4.d">Two AI coding tools edit the same project. Process files expire by rule; real code stays classified and searchable.</p></div>
+      <div class="card"><div class="n">5</div><h3 data-i18n="s5.t">Data-analysis runs</h3><p data-i18n="s5.d">One analysis spawns forty CSVs and charts. Categories file them automatically; full-text search finds the one table with the answer.</p></div>
+      <div class="card"><div class="n">6</div><h3 data-i18n="s6.t">The book manuscript</h3><p data-i18n="s6.d">Chapters polished by AI over and over — the version chain stays legible, and any chapter's latest draft packs in one click.</p></div>
+      <div class="card"><div class="n">7</div><h3 data-i18n="s7.t">Bid & proposal war-room</h3><p data-i18n="s7.d">Dozens of attachments, many hands, a hard deadline. One Final per document, and a single-copy alarm on the files that matter.</p></div>
+      <div class="card"><div class="n">8</div><h3 data-i18n="s8.t">AI image batches</h3><p data-i18n="s8.d">One prompt, twenty variants. The preview-thumbnail grid replaces Finder roulette; duplicates vanish.</p></div>
+      <div class="card"><div class="n">9</div><h3 data-i18n="s9.t">Family media vault</h3><p data-i18n="s9.d">Phone and drone footage across a laptop, a desktop and a NAS — registered in one place, with verified second copies for the irreplaceable originals.</p></div>
+      <div class="card"><div class="n">10</div><h3 data-i18n="s10.t">The 3 a.m. “where is that file?”</h3><p data-i18n="s10.d">Something half-remembered from a chat last month: search by what it says, or open the conversation that made it. Milliseconds, not an evening of digging.</p></div>
+    </div>
+  </div>
+</section>
 <section id="how">
   <div class="wrap split">
     <div>
@@ -216,7 +235,30 @@ cd macos &amp;&amp; ./build.sh &amp;&amp; open build/Guicang.app</pre>
 <script>
 const I18N = {
   zh: {
-    "nav.features":"功能","nav.how":"原理","nav.bench":"性能实测","nav.open":"开源与云",
+    "nav.features":"功能",
+    "nav.scen":"应用场景",
+    "scen.title":"十个天天发生的乱局",
+    "scen.lede":"LeanFile 真正派上用场的地方——它的第一位用户每天都在过的日子：",
+    "s1.t":"一篇文章，十二个“终版”",
+    "s1.d":"用 AI 反反复复改稿：初稿 v1……终版_FINAL_v12。LeanFile 里正式版永远只有一个，之前的每一稿都一键可达。",
+    "s2.t":"视频制作的素材洪流",
+    "s2.d":"一条 7 分钟的片子 = 几百个片段、配音分片和渲染稿。分片自动成组；点一次，整次对话的成果打包交付。",
+    "s3.t":"给客户的咨询交付",
+    "s3.d":"一份方案 PPT 跨了几周会议反复改。正式版没有歧义——打包出来的，就是发给客户的那一份。",
+    "s4.t":"AI 结对编程的 sprawl",
+    "s4.d":"两个 AI 编程工具同改一个项目。过程文件按规则过期，真代码留得下、分得清、搜得到。",
+    "s5.t":"一次数据分析，四十个文件",
+    "s5.d":"CSV 和图表满天飞。分类自动归档；全文检索直接找出有答案的那张表。",
+    "s6.t":"写书与治学",
+    "s6.d":"书稿章节被 AI 一遍遍润色——版本线清清楚楚，任意一章的最新稿一键打包。",
+    "s7.t":"投标与申报的战时状态",
+    "s7.d":"几十份附件、很多人手、一个死线。每份文件只有一个正式版，重要的那几份有单副本报警。",
+    "s8.t":"AI 生图，一次二十张",
+    "s8.d":"预览图网格挑图，告别在 Finder 里开盲盒；重复的自动消失。",
+    "s9.t":"家庭影像库",
+    "s9.d":"手机和无人机素材散在笔记本、台式机和 NAS 上——一处登记看全貌，不可再生的原片有验过哈希的第二副本。",
+    "s10.t":"凌晨三点的“那个文件在哪？”",
+    "s10.d":"上个月某次对话里模模糊糊记得的东西：按内容搜，或者打开那次对话。是几毫秒，不是一晚上翻箱倒柜。","nav.how":"原理","nav.bench":"性能实测","nav.open":"开源与云",
     "hero.tag":"你的 AI 生成的每一个文件——自动汇聚、自动去重、按对话组织、毫秒级找回。",
     "hero.sub":"AI 工具生产草稿、变体、渲染稿和分片的速度，已经超过任何文件夹体系能承受的程度。LeanFile 是位于你的文件之上的一层资产层，安静地把它们管起来。",
     "hero.cta1":"在 GitHub 查看","hero.cta2":"快速开始",
