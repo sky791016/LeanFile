@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.db
+macos/build/
+guicang-quarantine/
+preview-cache/
+demo2/
+demo/*.mp4
+profiles/
+REPORT-KY-FIRST-SCAN.md
+.DS_Store
+DEV-NOTES.local.md

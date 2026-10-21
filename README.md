@@ -1,0 +1,111 @@
+# Trove （归藏）
+
+**Every file your AI makes — gathered, deduplicated, organized by conversation, and findable in milliseconds.**
+
+AI tools now produce files faster than any folder system can absorb:
+drafts, variants, renders, shards — thousands of near-identical files
+scattered across machines and NAS drives. Trove is the asset layer that
+sits on top of your files and quietly keeps them in order.
+
+> Trove is the global name of 归藏 (Guicang, "all things return and are
+> treasured"), after the ancient *Guicang Yi*. The codebase keeps the
+> `guicang` codename.
+
+## What it does — five outcomes, not process data
+
+Users don't care about version graphs. They care that:
+
+1. **Duplicates disappear automatically** — identical content keeps one
+   best copy; extras are quarantined (never hard-deleted), restorable
+   in one click.
+2. **Files classify themselves** — every file gets a category and an
+   importance class: *protected / keep / ephemeral*.
+3. **Full-text search actually finds things** — SQLite FTS5 over
+   document bodies, millisecond queries at 10k+ files.
+4. **Important files can't be lost** — protected files are monitored
+   for single-copy risk and replicated across storage nodes.
+5. **Junk expires by rule** — you set the rules (keep process versions
+   N days, quarantine retention, …); Trove executes them, always via
+   quarantine first, always logged, always reversible.
+
+## Organized by conversation
+
+You remember a file by *the chat that produced it*, not by its folder.
+Trove organizes files under the LLM conversation / work session that
+created them: registrations carry conversation metadata (tool, model,
+title), and legacy files are reconstructed into sessions by project
+folder + time-window analysis — honestly labeled *inferred*, never
+presented as fact.
+
+## Dashboard first
+
+The macOS app opens on a dashboard: totals, capacity, category and
+type breakdowns, production-by-day timeline. Click any category and
+the right pane lists its files — switchable between list view and a
+preview-thumbnail grid. Full previews (Quick Look thumbnails, text
+excerpts) and source-conversation cards make every file legible at a
+glance.
+
+## Architecture
+
+- **Core engine (Python, platform-independent)** — content-hash
+  identity (SHA-256), sidecar manifest protocol (`.guicang.json`),
+  version chains, state machine, dedup, near-duplicate clustering
+  (SimHash candidates + Jaccard verification), FTS5 indexing,
+  storage-node scanning and replication, autopilot rules engine.
+- **Native macOS app (SwiftUI)** — resident, launch-at-login,
+  Finder-companion UI reading the same SQLite registry; all database
+  work runs off the main thread.
+- **Compute tiers** — local algorithms first, local models / BYO
+  endpoints next, optional official cloud for hosted compute,
+  sync and team features (open-core model).
+
+Measured on a synthetic fragmented corpus (25,325 files: variant
+groups, duplicates, shards, noise): ingest ≈ 2 s (~13k files/s),
+incremental rescan 0.4 s, duplicate detection 375/375, variant
+clustering 99.6% recall at 100% precision, shard reassembly 150/150,
+FTS queries 0.5–6 ms. See `BENCH-20261022.md`.
+
+## Quick start (engine CLI)
+
+```bash
+python3 -m guicang.cli --db trove.db scan-node --name mac --path ~/Documents --kind local
+python3 -m guicang.cli --db trove.db build-previews
+python3 -m guicang.cli --db trove.db infer-batches
+python3 -m guicang.cli --db trove.db conversations
+python3 -m guicang.cli --db trove.db autopilot-classify
+python3 -m guicang.cli --db trove.db cleanup-plan
+python3 tests/test_core.py   # and the other tests/test_*.py suites
+```
+
+## macOS app
+
+```bash
+cd macos && ./build.sh   # Command Line Tools only, no full Xcode
+open build/Guicang.app
+```
+
+The UI follows your system language (Chinese / English).
+
+## Safety contract
+
+- Nothing is ever hard-deleted by automation. Cleanup moves files to
+  a quarantine area with a full log; restore is one command.
+- The last copy of anything, the current version of anything, and
+  final/published files are untouchable by cleanup rules.
+- Inferred information is labeled *inferred* everywhere it appears.
+
+## License
+
+Apache License 2.0 — see `LICENSE`.
+
+---
+
+## 中文简介
+
+归藏 Trove 是 macOS 上的 AI 文件资产层：为大模型时代“碎片化的大规模
+文件生产”而建。自动去重、自动分类、全文检索、重要文件多副本保护、
+过程文件按规则过期清理；文件按“产生它的那次对话”组织；总览仪表盘
+下钻到任意类别的清单（列表/预览图双视图）。本地核心开源免费
+（Apache 2.0），智能算力本地优先，无本地算力的用户可选用官方云
+增值服务。

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- LaunchAgent template: install to ~/Library/LaunchAgents/ and adjust
+     the binary path. Production builds register via SMAppService instead. -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.guicang.app</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Applications/Guicang.app/Contents/MacOS/Guicang</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>LimitLoadToSessionType</key>
+    <string>Aqua</string>
+</dict>
+</plist>

@@ -1,0 +1,1 @@
+{"asset_key":"tahoe::narration-en","name":"太浩湖 EN 旁白稿","project":"太浩湖航拍片","intent":"英文版配音稿","provenance":{"tool":"Claude","model":"claude-sonnet","prompt":"translate narration to EN","inputs":["tahoe::script"],"params":{}}}
