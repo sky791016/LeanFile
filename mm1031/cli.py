@@ -7,13 +7,13 @@ from .core import Registry, load_manifest_for
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="guicang")
-    ap.add_argument("--db", default="guicang.db")
+    ap = argparse.ArgumentParser(prog="mm1031")
+    ap.add_argument("--db", default="mm1031.db")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("register")
     p.add_argument("file")
-    p.add_argument("--manifest", help="path to a .guicang.json manifest")
+    p.add_argument("--manifest", help="path to a .mm1031.json manifest")
 
     sub.add_parser("inbox")
 
@@ -51,7 +51,7 @@ def main(argv=None):
     p.add_argument("--full", action="store_true", help="print every action")
 
     p = sub.add_parser("autopilot-run")
-    p.add_argument("--quarantine-dir", default="guicang-quarantine")
+    p.add_argument("--quarantine-dir", default="mm1031-quarantine")
     p.add_argument("--yes", action="store_true",
                    help="required: confirms the plan shown by autopilot-plan")
 
@@ -63,7 +63,7 @@ def main(argv=None):
     p = sub.add_parser("cleanup-plan")
 
     p = sub.add_parser("cleanup-run")
-    p.add_argument("--quarantine-dir", default="guicang-quarantine")
+    p.add_argument("--quarantine-dir", default="mm1031-quarantine")
 
     p = sub.add_parser("build-previews")
     p.add_argument("--cache", default="preview-cache")
@@ -87,7 +87,7 @@ def main(argv=None):
 
     p = sub.add_parser("summarize")
     p.add_argument("file")
-    p.add_argument("--config", default="guicang.config.json")
+    p.add_argument("--config", default="mm1031.config.json")
     p.add_argument("--asset", help="asset id to log compute provenance against")
 
     args = ap.parse_args(argv)

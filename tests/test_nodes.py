@@ -4,8 +4,8 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.core import Registry
-from guicang.nodes import (
+from mm1031.core import Registry
+from mm1031.nodes import (
     add_node,
     coverage,
     list_nodes,

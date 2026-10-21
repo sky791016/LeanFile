@@ -1,8 +1,22 @@
 import SwiftUI
 import AppKit
 
+extension Color {
+    static let brandNavy = Color(red: 0.043, green: 0.169, blue: 0.294)
+    static let brandNavyDeep = Color(red: 0.027, green: 0.102, blue: 0.184)
+    static let brandBlue = Color(red: 0.082, green: 0.365, blue: 0.937)
+    static let brandCyan = Color(red: 0.220, green: 0.741, blue: 0.973)
+    static let brandGold = Color(red: 0.788, green: 0.635, blue: 0.153)
+}
+
+let brandGradient = LinearGradient(
+    colors: [.brandBlue, .brandCyan], startPoint: .leading, endPoint: .trailing)
+let navyGradient = LinearGradient(
+    colors: [.brandNavy, .brandNavyDeep],
+    startPoint: .topLeading, endPoint: .bottomTrailing)
+
 @main
-struct GuicangApp: App {
+struct MM1031App: App {
     @StateObject private var store = Store()
 
     var body: some Scene {
@@ -86,6 +100,7 @@ final class Store: ObservableObject {
     @Published var dups: [DupRow] = []
     @Published var conversationsList: [ConversationRow] = []
     @Published var selectedConversationId: String?
+    @Published var langTick = 0
     @Published var counts = (inbox: 0, total: 0, finals: 0, dups: 0, convs: 0)
     @Published var selectedAssetId: String?
     @Published var versions: [VersionRow] = []
@@ -97,13 +112,13 @@ final class Store: ObservableObject {
     private var db: Database?
     // All database work runs on this serial queue, never on the main
     // thread: the UI must never freeze waiting for SQLite.
-    private let queue = DispatchQueue(label: "tech.guicang.store", qos: .userInitiated)
+    private let queue = DispatchQueue(label: "tech.mm1031.store", qos: .userInitiated)
     private var searchWork: DispatchWorkItem?
 
     init() {
-        let env = ProcessInfo.processInfo.environment["GUICANG_DB"]
+        let env = (ProcessInfo.processInfo.environment["MM1031_DB"] ?? ProcessInfo.processInfo.environment["GUICANG_DB"])
         let home = FileManager.default.homeDirectoryForCurrentUser.path
-        let path = env ?? (home + "/guicang-dev/ky-live.db")
+        let path = env ?? (home + "/mm1031-dev/ky-live.db")
         db = Database(path: path)
         reload()
     }
@@ -321,12 +336,12 @@ final class Store: ObservableObject {
         queue.async { [weak self] in
             guard let self, let db = self.db else { return }
             let home = FileManager.default.homeDirectoryForCurrentUser.path
-            let repo = home + "/guicang-dev"
+            let repo = home + "/mm1031-dev"
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
             p.arguments = [
-                "-m", "guicang.cli", "--db", db.path, "cleanup-run",
-                "--quarantine-dir", repo + "/guicang-quarantine",
+                "-m", "mm1031.cli", "--db", db.path, "cleanup-run",
+                "--quarantine-dir", repo + "/mm1031-quarantine",
             ]
             p.currentDirectoryURL = URL(fileURLWithPath: repo)
             let pipe = Pipe()
@@ -352,10 +367,10 @@ final class Store: ObservableObject {
         queue.async { [weak self] in
             guard let self, let db = self.db else { return }
             let home = FileManager.default.homeDirectoryForCurrentUser.path
-            let repo = home + "/guicang-dev"
+            let repo = home + "/mm1031-dev"
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
-            p.arguments = ["-m", "guicang.cli", "--db", db.path] + args
+            p.arguments = ["-m", "mm1031.cli", "--db", db.path] + args
             p.currentDirectoryURL = URL(fileURLWithPath: repo)
             let pipe = Pipe()
             p.standardOutput = pipe
@@ -387,30 +402,33 @@ final class Store: ObservableObject {
 
 struct ContentView: View {
     @EnvironmentObject var store: Store
-
     var body: some View {
-        NavigationSplitView {
-            List(Section.allCases, selection: Binding(
-                get: { store.section },
-                set: { if let s = $0 { store.select(section: s) } }
-            )) { s in
-                Label(s.title, systemImage: s.icon)
-                    .badge(badge(for: s))
-                    .tag(s)
-            }
-            .navigationSplitViewColumnWidth(min: 170, ideal: 190)
-        } content: {
-            contentColumn
-        } detail: {
-            if store.detailShowsDrill {
-                DrillView()
+        Group {
+            if store.section == .about || store.section == .rules {
+                // Utility pages: two columns, no file inspector.
+                NavigationSplitView {
+                    SidebarView(badge: badge)
+                } detail: {
+                    contentColumn
+                }
             } else {
-                inspector
+                NavigationSplitView {
+                    SidebarView(badge: badge)
+                } content: {
+                    contentColumn
+                } detail: {
+                    if store.detailShowsDrill {
+                        DrillView()
+                    } else {
+                        inspector
+                    }
+                }
             }
         }
         .searchable(text: $store.searchText, prompt: L.t("search.prompt"))
         .onChange(of: store.searchText) { _, _ in store.searchChanged() }
         .onAppear { SelfShot.kick(store: store) }
+        .id(store.langTick)
     }
 
     private func badge(for s: Section) -> Int {
@@ -686,32 +704,56 @@ struct DashboardView: View {
         // use explicit buttons instead.
         List {
             SwiftUI.Section {
+                HStack(spacing: 12) {
+                    Image(nsImage: NSApplication.shared.applicationIconImage)
+                        .resizable().frame(width: 40, height: 40)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("LeanFile").font(.headline).foregroundStyle(.white)
+                        Text(L.t("dash.tagline"))
+                            .font(.caption).foregroundStyle(.white.opacity(0.75))
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(store.dash.totalFiles)")
+                            .font(.title3).bold().foregroundStyle(.white)
+                        Text(L.t("card.files"))
+                            .font(.caption2).foregroundStyle(Color.brandGold)
+                    }
+                }
+                .padding(12)
+                .background(navyGradient)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .listRowInsets(EdgeInsets(top: 6, leading: 10, bottom: 2, trailing: 10))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+            SwiftUI.Section {
                 LazyVGrid(
                     columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
                     spacing: 10
                 ) {
                     Button { store.openDrill(title: L.t("drill.all")) } label: {
-                        StatCard(title: L.t("card.files"), value: "\(store.dash.totalFiles)",
+                        StatCard(kind: "files", title: L.t("card.files"), value: "\(store.dash.totalFiles)",
                                  sub: L.f("card.filesSub", store.dash.totalCopies))
                     }.buttonStyle(.plain)
                     Button { store.openDrill(title: L.t("drill.all")) } label: {
-                        StatCard(title: L.t("card.space"), value: humanBytes(store.dash.totalBytes),
+                        StatCard(kind: "space", title: L.t("card.space"), value: humanBytes(store.dash.totalBytes),
                                  sub: L.t("card.spaceSub"))
                     }.buttonStyle(.plain)
                     Button { store.select(section: .conversations) } label: {
-                        StatCard(title: L.t("card.conv"), value: "\(store.dash.conversations)",
+                        StatCard(kind: "conv", title: L.t("card.conv"), value: "\(store.dash.conversations)",
                                  sub: L.t("card.convSub"))
                     }.buttonStyle(.plain)
                     Button { store.openDrill(title: L.t("drill.finals"), finals: true) } label: {
-                        StatCard(title: L.t("card.finals"), value: "\(store.dash.finals)",
+                        StatCard(kind: "finals", title: L.t("card.finals"), value: "\(store.dash.finals)",
                                  sub: L.t("card.finalsSub"))
                     }.buttonStyle(.plain)
                     Button { store.select(section: .cleanup) } label: {
-                        StatCard(title: L.t("card.reclaim"), value: humanBytes(store.dash.reclaimable),
+                        StatCard(kind: "reclaim", title: L.t("card.reclaim"), value: humanBytes(store.dash.reclaimable),
                                  sub: L.t("card.reclaimSub"))
                     }.buttonStyle(.plain)
                     Button { store.openDrill(title: L.t("drill.protect"), protect: true) } label: {
-                        StatCard(title: L.t("card.protect"), value: "\(store.dash.protectTotal)",
+                        StatCard(kind: "protect", title: L.t("card.protect"), value: "\(store.dash.protectTotal)",
                                  sub: store.dash.protectAtRisk > 0
                                     ? L.f("card.protectRisk", store.dash.protectAtRisk)
                                     : L.t("card.protectOk"))
@@ -823,33 +865,71 @@ struct DashboardView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             GeometryReader { g in
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.accentColor.opacity(0.55))
-                    .frame(
-                        width: max(3, g.size.width * CGFloat(r.bytes) / CGFloat(max(maxBytes, 1))),
-                        height: 5
-                    )
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.secondary.opacity(0.12))
+                        .frame(height: 6)
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(brandGradient)
+                        .frame(
+                            width: max(3, g.size.width * CGFloat(r.bytes) / CGFloat(max(maxBytes, 1))),
+                            height: 6
+                        )
+                }
             }
-            .frame(height: 5)
+            .frame(height: 6)
         }
         .padding(.vertical, 1)
     }
 }
 
 struct StatCard: View {
+    let kind: String
     let title: String
     let value: String
     let sub: String
+
+    private var icon: String {
+        switch kind {
+        case "files": return "doc.on.doc.fill"
+        case "space": return "internaldrive.fill"
+        case "conv": return "text.bubble.fill"
+        case "finals": return "checkmark.seal.fill"
+        case "reclaim": return "trash.fill"
+        case "protect": return "shield.fill"
+        default: return "doc.fill"
+        }
+    }
+    private var tint: Color {
+        switch kind {
+        case "files": return .brandBlue
+        case "space": return Color(red: 0.35, green: 0.35, blue: 0.90)
+        case "conv": return Color(red: 0.05, green: 0.60, blue: 0.60)
+        case "finals": return Color(red: 0.13, green: 0.62, blue: 0.33)
+        case "reclaim": return Color(red: 0.90, green: 0.50, blue: 0.13)
+        case "protect": return Color(red: 0.85, green: 0.30, blue: 0.25)
+        default: return .brandBlue
+        }
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title).font(.caption2).foregroundStyle(.secondary)
-            Text(value).font(.title3).bold()
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.caption2).foregroundStyle(.white)
+                    .frame(width: 20, height: 20)
+                    .background(tint)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                Text(title).font(.caption2).foregroundStyle(.secondary)
+            }
+            Text(value).font(.title3).bold().foregroundStyle(Color.brandNavy)
             Text(sub).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(9)
-        .background(Color.secondary.opacity(0.07))
-        .clipShape(RoundedRectangle(cornerRadius: 9))
+        .padding(10)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.07), radius: 5, x: 0, y: 2)
     }
 }
 
@@ -1048,6 +1128,9 @@ struct DrillTile: View {
 // MARK: - About the author
 
 struct AboutView: View {
+    @EnvironmentObject var store: Store
+    @AppStorage("mm1031.lang") private var langPref = ""
+
     private var feedbackURL: URL {
         var c = URLComponents(string: "mailto:sky.kugua@gmail.com")!
         c.queryItems = [
@@ -1067,6 +1150,16 @@ struct AboutView: View {
 
     var body: some View {
         Form {
+            SwiftUI.Section("语言 Language") {
+                Picker("语言 Language", selection: $langPref) {
+                    Text("跟随系统 System").tag("")
+                    Text("中文").tag("zh")
+                    Text("English").tag("en")
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .onChange(of: langPref) { _, _ in store.langTick += 1 }
+            }
             SwiftUI.Section {
                 HStack(spacing: 16) {
                     Image(nsImage: NSApplication.shared.applicationIconImage)
@@ -1090,13 +1183,18 @@ struct AboutView: View {
                     }
                     VStack(alignment: .leading, spacing: 6) {
                         Text("史凯 Kai Shi").font(.title3).bold()
+                            .foregroundStyle(.white)
                         Text(L.t("about.role"))
-                            .font(.subheadline).foregroundStyle(.secondary)
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.75))
                         Text(L.t("about.bio")).font(.body)
+                            .foregroundStyle(.white.opacity(0.92))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                .padding(.vertical, 6)
+                .padding(14)
+                .background(navyGradient)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             SwiftUI.Section {
                 HStack(spacing: 12) {
@@ -1132,6 +1230,194 @@ struct AboutView: View {
             }
         }
         .formStyle(.grouped)
+    }
+}
+
+// MARK: - Sidebar (brand) + ad card
+
+struct AdEntry: Codable, Identifiable {
+    var id: String
+    var icon: String
+    var tint: String
+    var titleZh: String
+    var titleEn: String
+    var textZh: String
+    var textEn: String
+    var url: String
+    var title: String { L.isZh ? titleZh : titleEn }
+    var text: String { L.isZh ? textZh : textEn }
+    var tintColor: Color {
+        switch tint {
+        case "gold": return .brandGold
+        case "cyan": return .brandCyan
+        case "green": return Color(red: 0.15, green: 0.65, blue: 0.35)
+        default: return .brandBlue
+        }
+    }
+}
+
+enum AdService {
+    static let defaults: [AdEntry] = [
+        AdEntry(id: "book", icon: "book.closed.fill", tint: "blue",
+                titleZh: "《精益数据方法论》", titleEn: "Lean Data Discovery",
+                textZh: "英文版由 Springer Nature 全球出版——数据驱动的数字化转型方法论。",
+                textEn: "The Lean Data Methodology, published worldwide by Springer Nature.",
+                url: "https://leanvalue.online"),
+        AdEntry(id: "course", icon: "graduationcap.fill", tint: "cyan",
+                titleZh: "凯哥讲 AI · LeanFDE", titleEn: "Kai Talks AI · LeanFDE",
+                textZh: "从 AI Native 到 Value Native：FDE 落地方法与课程。",
+                textEn: "From AI Native to Value Native — the FDE playbook and courses.",
+                url: "https://leanvalue.online"),
+        AdEntry(id: "cloud", icon: "cloud.fill", tint: "gold",
+                titleZh: "LeanFile 官方云", titleEn: "LeanFile Cloud",
+                textZh: "同步、备份、团队协作——增值云服务即将上线，敬请期待。",
+                textEn: "Sync, backup and team collaboration — the official cloud is coming soon.",
+                url: "https://sky791016.github.io/LeanFile/#cloud"),
+        AdEntry(id: "sponsor", icon: "megaphone.fill", tint: "green",
+                titleZh: "赞助位招租", titleEn: "Your product here",
+                textZh: "这个位置也可以是你的产品——赞助 LeanFile，触达 AI 文件管理用户。",
+                textEn: "This slot can carry your product — sponsor LeanFile and reach AI-era file users.",
+                url: "mailto:sky.kugua@gmail.com"),
+    ]
+
+    static func fetchRemote(_ done: @escaping ([AdEntry]) -> Void) {
+        guard let u = URL(string: "https://sky791016.github.io/LeanFile/ads.json")
+        else { return }
+        URLSession.shared.dataTask(with: u) { data, _, _ in
+            guard let data,
+                  let list = try? JSONDecoder().decode([AdEntry].self, from: data),
+                  !list.isEmpty else { return }
+            DispatchQueue.main.async { done(list) }
+        }.resume()
+    }
+}
+
+struct AdCard: View {
+    @State private var entries: [AdEntry] = AdService.defaults
+    @State private var idx = 0
+    @State private var hidden = false
+    private let timer = Timer.publish(every: 18, on: .main, in: .common)
+        .autoconnect()
+
+    var body: some View {
+        if !hidden && !entries.isEmpty {
+            let ad = entries[idx % entries.count]
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(L.isZh ? "广告" : "AD")
+                        .font(.caption2).bold().foregroundStyle(Color.brandGold)
+                    Spacer()
+                    Button { hidden = true } label: {
+                        Image(systemName: "xmark").font(.caption2)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.white.opacity(0.5))
+                }
+                Button {
+                    if let u = URL(string: ad.url) {
+                        NSWorkspace.shared.open(u)
+                    }
+                } label: {
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack(spacing: 7) {
+                            Image(systemName: ad.icon)
+                                .font(.subheadline).foregroundStyle(.white)
+                                .frame(width: 24, height: 24)
+                                .background(ad.tintColor)
+                                .clipShape(RoundedRectangle(cornerRadius: 7))
+                            Text(ad.title)
+                                .font(.subheadline).bold()
+                                .foregroundStyle(.white).lineLimit(1)
+                        }
+                        Text(ad.text)
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.78))
+                            .lineLimit(3)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(11)
+            .background(Color.white.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(0.12), lineWidth: 1)
+            )
+            .onReceive(timer) { _ in idx = (idx + 1) % entries.count }
+            .onAppear { AdService.fetchRemote { entries = $0 } }
+        }
+    }
+}
+
+struct SidebarView: View {
+    @EnvironmentObject var store: Store
+    let badge: (Section) -> Int
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                Image(nsImage: NSApplication.shared.applicationIconImage)
+                    .resizable().frame(width: 30, height: 30)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("LeanFile").font(.headline).foregroundStyle(.white)
+                    Text("MM1031")
+                        .font(.caption2).foregroundStyle(Color.brandGold)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 14)
+            .padding(.bottom, 10)
+
+            VStack(spacing: 2) {
+                ForEach(Section.allCases) { s in
+                    Button { store.select(section: s) } label: {
+                        HStack(spacing: 9) {
+                            Image(systemName: s.icon).frame(width: 18)
+                            Text(s.title).font(.subheadline).lineLimit(1)
+                            Spacer()
+                            if badge(s) > 0 {
+                                Text("\(badge(s))")
+                                    .font(.caption2).bold()
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.white.opacity(0.16))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        .foregroundStyle(
+                            store.section == s ? .white : .white.opacity(0.72))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            store.section == s
+                                ? Color.white.opacity(0.13) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(alignment: .leading) {
+                            if store.section == s {
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(Color.brandGold)
+                                    .frame(width: 3, height: 18)
+                                    .offset(x: -6)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 10)
+
+            Spacer()
+            AdCard().padding(.horizontal, 10)
+            Text("v0.1.0")
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.4))
+                .padding(.vertical, 8)
+        }
+        .background(navyGradient)
+        .navigationSplitViewColumnWidth(min: 200, ideal: 220)
     }
 }
 

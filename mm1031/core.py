@@ -246,9 +246,11 @@ class Registry:
 
 
 def load_manifest_for(path):
-    """Sidecar convention: <file>.guicang.json next to the asset."""
-    sidecar = path + ".guicang.json"
-    if os.path.exists(sidecar):
-        with open(sidecar, encoding="utf-8") as f:
-            return json.load(f)
+    """Sidecar convention: <file>.mm1031.json next to the asset.
+    The legacy <file>.guicang.json name is still read for compatibility."""
+    for suffix in (".mm1031.json", ".guicang.json"):
+        sidecar = path + suffix
+        if os.path.exists(sidecar):
+            with open(sidecar, encoding="utf-8") as f:
+                return json.load(f)
     return None

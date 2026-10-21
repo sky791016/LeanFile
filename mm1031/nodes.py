@@ -151,7 +151,7 @@ def replication_plan(reg, target_node):
             continue
         dest = os.path.join(
             target["path"],
-            "GuicangVault",
+            "LeanFileVault",
             r["blob"][:2],
             r["blob"][:16] + "_" + os.path.basename(src["path"]),
         )

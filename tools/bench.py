@@ -7,7 +7,7 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.engine import cluster_text_variants, detect_shard_groups, parallel_ingest
+from mm1031.engine import cluster_text_variants, detect_shard_groups, parallel_ingest
 
 
 def main(root, truth_path, db_path):
@@ -86,7 +86,7 @@ def main(root, truth_path, db_path):
           f"pattern-groups found={len(found)} recovered={recovered}")
 
     # full-text index build + query latency (FSearch-style instant search)
-    from guicang.engine import build_content_index, search_content
+    from mm1031.engine import build_content_index, search_content
 
     t0 = time.time()
     info = build_content_index(db)

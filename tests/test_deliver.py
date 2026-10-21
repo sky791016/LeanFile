@@ -5,10 +5,10 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.core import Registry
-from guicang.nodes import add_node, scan_node
-from guicang.autopilot import classify_all, protect_plan
-from guicang.deliver import export_bundle, protect_run
+from mm1031.core import Registry
+from mm1031.nodes import add_node, scan_node
+from mm1031.autopilot import classify_all, protect_plan
+from mm1031.deliver import export_bundle, protect_run
 
 
 def write(path, data):

@@ -5,9 +5,9 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.core import Registry
-from guicang.preview import conversation_tree, infer_conversation_batches
-from guicang.nodes import add_node, scan_node
+from mm1031.core import Registry
+from mm1031.preview import conversation_tree, infer_conversation_batches
+from mm1031.nodes import add_node, scan_node
 
 
 def write(path, data):

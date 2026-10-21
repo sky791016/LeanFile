@@ -2,7 +2,7 @@ __pycache__/
 *.pyc
 *.db
 macos/build/
-guicang-quarantine/
+mm1031-quarantine/
 preview-cache/
 demo2/
 demo/*.mp4

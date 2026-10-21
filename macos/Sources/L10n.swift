@@ -1,16 +1,22 @@
 import Foundation
 
 /// UI language follows the operating system: Chinese systems get
-/// Chinese, everything else gets English. GUICANG_LANG=zh|en overrides
+/// Chinese, everything else gets English. MM1031_LANG=zh|en overrides
 /// (used for testing and screenshots).
 enum L {
-    static let isZh: Bool = {
-        if let o = ProcessInfo.processInfo.environment["GUICANG_LANG"] {
+    /// In-app language choice (About page): UserDefaults "mm1031.lang"
+    /// ("zh"/"en") wins; empty follows env override, then the system.
+    static var isZh: Bool {
+        if let o = UserDefaults.standard.string(forKey: "mm1031.lang"),
+           !o.isEmpty {
+            return o.hasPrefix("zh")
+        }
+        if let o = ProcessInfo.processInfo.environment["MM1031_LANG"] ?? ProcessInfo.processInfo.environment["GUICANG_LANG"] {
             return o.hasPrefix("zh")
         }
         let lang = Locale.preferredLanguages.first ?? "en"
         return lang.hasPrefix("zh")
-    }()
+    }
 
     static func t(_ key: String) -> String {
         (isZh ? zh : en)[key] ?? key
@@ -67,6 +73,7 @@ enum L {
         "section.cleanup": "重复文件",
         "section.rules": "自动规则",
         "section.about": "关于作者",
+        "dash.tagline": "AI 时代的文件管家",
         "about.role": "精益数据方法论创始人 · 《精益数据方法论》作者",
         "about.bio": "史凯（Kai Shi），《精益数据方法论》作者，英文版 Lean Data Discovery 由 Springer Nature 全球出版。20 多年数字化转型与数据战略经验，服务过 100 多家企业，2019 年入选 DataIQ 100。LeanFile 是他把自己的方法论做成的工具——先用在自己身上，再开源给所有人。",
         "about.app": "LeanFile —— AI 时代的文件管家。免费、开源。",
@@ -181,6 +188,7 @@ enum L {
         "section.cleanup": "Duplicates",
         "section.rules": "Auto Rules",
         "section.about": "About the Author",
+        "dash.tagline": "File care for the AI era",
         "about.role": "Founder of the Lean Data Methodology · Author of Lean Data Discovery",
         "about.bio": "Kai Shi is the author of the Lean Data Methodology — English edition Lean Data Discovery, published worldwide by Springer Nature. 20+ years in digital transformation and data strategy, 100+ enterprises served, DataIQ 100 (2019). LeanFile is his methodology turned into a tool — he runs his own files on it first, then open-sourced it for everyone.",
         "about.app": "LeanFile — file care for the AI era. Free and open source.",

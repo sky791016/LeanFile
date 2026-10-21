@@ -4,8 +4,8 @@
 
 ## 进程结构（两个进程，各司其职）
 
-1. Guicang.app（SwiftUI）：主窗口 + 菜单栏常驻（MenuBarExtra）。负责一切人机交互：即时搜索、收件箱拍板、版本浏览与恢复、去重确认、覆盖率报告。关窗不退出，索引与守护由下面的进程负责。
-2. GuicangHelper（LaunchAgent 守护进程，无界面）：开机自启（SMAppService 注册 / LaunchAgent），常驻内存。负责：
+1. LeanFile.app（SwiftUI）：主窗口 + 菜单栏常驻（MenuBarExtra）。负责一切人机交互：即时搜索、收件箱拍板、版本浏览与恢复、去重确认、覆盖率报告。关窗不退出，索引与守护由下面的进程负责。
+2. MM1031Helper（LaunchAgent 守护进程，无界面）：开机自启（SMAppService 注册 / LaunchAgent），常驻内存。负责：
    - FSEvents 监听登记目录的增删改（带防抖与背压队列），实时维护索引——FSearch 式「索引永远是最新的」
    - 版本捕获：受管文件变更时，把旧版以 APFS 克隆（clonefile，写时复制，近乎零空间）存入内容寻址版本库，再登记新版；版本不再靠改文件名
    - 内容抽取与全文索引（FTS5）：文本直读，PDF/Office 在 Mac 上走 PDFKit/textutil/Spotlight 导入器

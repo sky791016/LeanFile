@@ -9,7 +9,7 @@
     <key>CFBundleDisplayName</key>
     <string>LeanFile</string>
     <key>CFBundleIdentifier</key>
-    <string>tech.guicang.app</string>
+    <string>tech.mm1031.app</string>
     <key>CFBundleVersion</key>
     <string>0.1.0</string>
     <key>CFBundleShortVersionString</key>
@@ -17,7 +17,7 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleExecutable</key>
-    <string>Guicang</string>
+    <string>LeanFile</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>NSHighResolutionCapable</key>

@@ -151,7 +151,7 @@ macOS 应用打开就是总览：文件总数、占用空间、分类与类型�
 ## 架构
 
 - **核心引擎（Python，跨平台）**——内容哈希身份（SHA-256)、
-  sidecar 清单协议（`.guicang.json`）、版本链、状态机、去重、
+  sidecar 清单协议（`.mm1031.json`）、版本链、状态机、去重、
   近似重复聚类（SimHash 候选 + Jaccard 复核）、FTS5 索引、
   存放位置扫描与复制、自动规则引擎。
 - **macOS 原生应用（SwiftUI)**——常驻、开机自启，与引擎共用
@@ -167,16 +167,16 @@ macOS 应用打开就是总览：文件总数、占用空间、分类与类型�
 ## 快速开始（引擎 CLI)
 
 ```bash
-python3 -m guicang.cli --db leanfile.db node-add mac ~/Documents --kind local
-python3 -m guicang.cli --db leanfile.db scan mac
-python3 -m guicang.cli --db leanfile.db build-previews
-python3 -m guicang.cli --db leanfile.db infer-batches
-python3 -m guicang.cli --db leanfile.db conversations
-python3 -m guicang.cli --db leanfile.db autopilot-classify
-python3 -m guicang.cli --db leanfile.db cleanup-plan
-python3 -m guicang.cli --db leanfile.db bundle --latest      # 把一次对话打包交付
-python3 -m guicang.cli --db leanfile.db protect-run --yes    # 给重要文件补验哈希的第二副本
-python3 -m guicang.cli --db leanfile.db shards               # 列出分片组
+python3 -m mm1031.cli --db leanfile.db node-add mac ~/Documents --kind local
+python3 -m mm1031.cli --db leanfile.db scan mac
+python3 -m mm1031.cli --db leanfile.db build-previews
+python3 -m mm1031.cli --db leanfile.db infer-batches
+python3 -m mm1031.cli --db leanfile.db conversations
+python3 -m mm1031.cli --db leanfile.db autopilot-classify
+python3 -m mm1031.cli --db leanfile.db cleanup-plan
+python3 -m mm1031.cli --db leanfile.db bundle --latest      # 把一次对话打包交付
+python3 -m mm1031.cli --db leanfile.db protect-run --yes    # 给重要文件补验哈希的第二副本
+python3 -m mm1031.cli --db leanfile.db shards               # 列出分片组
 python3 tests/test_core.py   # 以及 tests/test_*.py 其余测试套件
 ```
 
@@ -184,7 +184,7 @@ python3 tests/test_core.py   # 以及 tests/test_*.py 其余测试套件
 
 ```bash
 cd macos && ./build.sh   # 只需 Command Line Tools，无需完整 Xcode
-open build/Guicang.app
+open build/LeanFile.app
 ```
 
 界面语言跟随系统（中文 / 英文）。

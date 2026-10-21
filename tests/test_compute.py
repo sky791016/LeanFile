@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.compute import (
+from mm1031.compute import (
     ComputeChain,
     EndpointProvider,
     LocalBasicProvider,
@@ -60,13 +60,13 @@ def run():
             "providers": [
                 {"name": "local-basic", "type": "local-basic"},
                 {
-                    "name": "guicang-cloud",
+                    "name": "mm1031-cloud",
                     "type": "endpoint",
                     "base_url": "http://127.0.0.1:9/v1",
-                    "model": "guicang-summary",
+                    "model": "mm1031-summary",
                 },
             ],
-            "routes": {"summarize": ["guicang-cloud", "local-basic"]},
+            "routes": {"summarize": ["mm1031-cloud", "local-basic"]},
         }
     }
     r4 = build_chain(cfg).summarize(TEXT)

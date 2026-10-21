@@ -1,0 +1,29 @@
+#!/bin/sh
+# Install the per-user LaunchAgent so LeanFile starts at login.
+CONSOLE_USER=$(stat -f %Su /dev/console)
+[ -z "$CONSOLE_USER" ] || [ "$CONSOLE_USER" = "root" ] && exit 0
+USER_HOME=$(eval echo "~$CONSOLE_USER")
+USER_ID=$(id -u "$CONSOLE_USER")
+AGENTS="$USER_HOME/Library/LaunchAgents"
+mkdir -p "$AGENTS"
+cat > "$AGENTS/com.mm1031.app.plist" << 'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.mm1031.app</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Applications/LeanFile.app/Contents/MacOS/LeanFile</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>LimitLoadToSessionType</key>
+    <string>Aqua</string>
+</dict>
+</plist>
+PLIST
+chown "$CONSOLE_USER" "$AGENTS/com.mm1031.app.plist"
+sudo -u "$CONSOLE_USER" launchctl bootstrap "gui/$USER_ID" "$AGENTS/com.mm1031.app.plist" 2>/dev/null || true
+exit 0

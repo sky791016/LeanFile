@@ -174,7 +174,7 @@ Real captures from the running app (the first user's live registry:
 ## Architecture
 
 - **Core engine (Python, platform-independent)** — content-hash
-  identity (SHA-256), sidecar manifest protocol (`.guicang.json`),
+  identity (SHA-256), sidecar manifest protocol (`.mm1031.json`),
   version chains, state machine, dedup, near-duplicate clustering
   (SimHash candidates + Jaccard verification), FTS5 indexing,
   storage-node scanning and replication, autopilot rules engine.
@@ -194,16 +194,16 @@ FTS queries 0.5–6 ms. See `BENCH-20261022.md`.
 ## Quick start (engine CLI)
 
 ```bash
-python3 -m guicang.cli --db leanfile.db node-add mac ~/Documents --kind local
-python3 -m guicang.cli --db leanfile.db scan mac
-python3 -m guicang.cli --db leanfile.db build-previews
-python3 -m guicang.cli --db leanfile.db infer-batches
-python3 -m guicang.cli --db leanfile.db conversations
-python3 -m guicang.cli --db leanfile.db autopilot-classify
-python3 -m guicang.cli --db leanfile.db cleanup-plan
-python3 -m guicang.cli --db leanfile.db bundle --latest      # pack a conversation for handover
-python3 -m guicang.cli --db leanfile.db protect-run --yes    # verified 2nd copies of important files
-python3 -m guicang.cli --db leanfile.db shards               # list shard groups
+python3 -m mm1031.cli --db leanfile.db node-add mac ~/Documents --kind local
+python3 -m mm1031.cli --db leanfile.db scan mac
+python3 -m mm1031.cli --db leanfile.db build-previews
+python3 -m mm1031.cli --db leanfile.db infer-batches
+python3 -m mm1031.cli --db leanfile.db conversations
+python3 -m mm1031.cli --db leanfile.db autopilot-classify
+python3 -m mm1031.cli --db leanfile.db cleanup-plan
+python3 -m mm1031.cli --db leanfile.db bundle --latest      # pack a conversation for handover
+python3 -m mm1031.cli --db leanfile.db protect-run --yes    # verified 2nd copies of important files
+python3 -m mm1031.cli --db leanfile.db shards               # list shard groups
 python3 tests/test_core.py   # and the other tests/test_*.py suites
 ```
 
@@ -211,7 +211,7 @@ python3 tests/test_core.py   # and the other tests/test_*.py suites
 
 ```bash
 cd macos && ./build.sh   # Command Line Tools only, no full Xcode
-open build/Guicang.app
+open build/LeanFile.app
 ```
 
 The UI follows your system language (Chinese / English).

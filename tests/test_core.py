@@ -5,7 +5,7 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.core import Registry, load_manifest_for
+from mm1031.core import Registry, load_manifest_for
 
 
 def write(path, data):
@@ -35,7 +35,7 @@ def run():
             "params": {},
         },
     }
-    with open(f1 + ".guicang.json", "w", encoding="utf-8") as f:
+    with open(f1 + ".mm1031.json", "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False)
     aid, seq, is_new = reg.register(f1, load_manifest_for(f1))
     assert is_new and seq == 1, (aid, seq, is_new)

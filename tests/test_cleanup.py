@@ -6,7 +6,7 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.autopilot import (
+from mm1031.autopilot import (
     cleanup_plan,
     get_rules,
     restore_quarantine,
@@ -14,7 +14,7 @@ from guicang.autopilot import (
     set_rule,
     stale_version_plan,
 )
-from guicang.core import Registry
+from mm1031.core import Registry
 
 
 def write(path, data):

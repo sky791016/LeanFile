@@ -4,7 +4,7 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from guicang.autopilot import (
+from mm1031.autopilot import (
     classify_all,
     dedup_plan,
     execute_quarantine,
@@ -12,8 +12,8 @@ from guicang.autopilot import (
     protect_plan,
     restore_quarantine,
 )
-from guicang.core import Registry
-from guicang.nodes import add_node, scan_node
+from mm1031.core import Registry
+from mm1031.nodes import add_node, scan_node
 
 
 def write(path, data):

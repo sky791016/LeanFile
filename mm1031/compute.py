@@ -111,7 +111,7 @@ class ComputeChain:
 
 
 def build_chain(config, feature="summarize"):
-    """config: parsed JSON dict (see guicang.config.example.json)."""
+    """config: parsed JSON dict (see mm1031.config.example.json)."""
     compute = (config or {}).get("compute") or {}
     specs = {p["name"]: p for p in compute.get("providers") or []}
     routes = (compute.get("routes") or {}).get(feature) or ["local-basic"]
