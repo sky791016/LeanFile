@@ -128,6 +128,7 @@ def build_chain(config, feature="summarize"):
                     spec.get("base_url", ""),
                     spec.get("model", ""),
                     key or None,
+                    timeout=spec.get("timeout", 60),
                 )
             )
         else:

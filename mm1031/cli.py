@@ -90,6 +90,32 @@ def main(argv=None):
     p.add_argument("--config", default="mm1031.config.json")
     p.add_argument("--asset", help="asset id to log compute provenance against")
 
+    p = sub.add_parser("tag-all")
+    p.add_argument("--content", action="store_true",
+                   help="also generate content keyword tags from excerpts")
+    p.add_argument("--config", default="mm1031.config.json")
+    p.add_argument("--refresh-content", action="store_true")
+
+    sub.add_parser("facets")
+
+    p = sub.add_parser("tag-filter")
+    p.add_argument("--tag", action="append", default=[],
+                   help="dim:value, repeatable; AND across dims")
+
+    p = sub.add_parser("organize-plan")
+    p.add_argument("node")
+    p.add_argument("--to", required=True, help="library root directory")
+
+    p = sub.add_parser("organize-run")
+    p.add_argument("node")
+    p.add_argument("--to", required=True, help="library root directory")
+    p.add_argument("--manifest", default="organize-manifest.json")
+    p.add_argument("--yes", action="store_true",
+                   help="required: confirms the organize-plan output")
+
+    p = sub.add_parser("organize-undo")
+    p.add_argument("--manifest", default="organize-manifest.json")
+
     args = ap.parse_args(argv)
     reg = Registry(args.db)
 
@@ -296,6 +322,53 @@ def main(argv=None):
                 result.model,
                 result.cost_units,
             )
+    elif args.cmd == "tag-all":
+        from .tagging import tag_all
+
+        print(tag_all(args.db, content=args.content,
+                      config_path=args.config,
+                      refresh_content=args.refresh_content))
+    elif args.cmd == "facets":
+        from .tagging import facets
+
+        for dim, items in facets(args.db).items():
+            print(f"[{dim}] " + " · ".join(
+                f"{t}×{n}" for t, n in items[:12]))
+    elif args.cmd == "tag-filter":
+        from .tagging import filter_assets
+
+        wanted = {}
+        for item in args.tag:
+            dim, _, value = item.partition(":")
+            wanted.setdefault(dim, []).append(value)
+        ids = filter_assets(args.db, wanted)
+        names = {
+            r[0]: r[1]
+            for r in reg.db.execute("SELECT id, name FROM assets")
+        }
+        for aid in ids:
+            print(f"{names.get(aid, '?')}  [{aid[:8]}]")
+        print(f"共 {len(ids)} 个")
+    elif args.cmd == "organize-plan":
+        from .organize import filing_plan
+
+        plan = filing_plan(args.db, args.node, args.to)
+        for item in plan:
+            print(f"{item['from']}  ->  {item['to']}")
+        print(f"共 {len(plan)} 个待归档（仅计划，未动任何文件）")
+    elif args.cmd == "organize-run":
+        from .organize import execute_plan, filing_plan
+
+        if not args.yes:
+            print("需要 --yes 确认（先跑 organize-plan 看清单）")
+            return 1
+        plan = filing_plan(args.db, args.node, args.to)
+        n = execute_plan(args.db, plan, args.manifest)
+        print(f"已归档 {n} 个文件，清单与撤销记录在 {args.manifest}")
+    elif args.cmd == "organize-undo":
+        from .organize import undo
+
+        print(f"已撤销 {undo(args.db, args.manifest)} 个文件的归档")
     return 0
 
 

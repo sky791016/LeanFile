@@ -54,6 +54,24 @@ def one_round(db_path, cache_dir, state=None, background_previews=True):
         from .preview import build_previews, infer_conversation_batches
 
         log("inference: %s" % infer_conversation_batches(db_path))
+        # Auto-tag the new arrivals (rules + content keywords) so the
+        # Tags page organizes them without anyone running a command.
+        # Content tagging skips assets that already have content tags,
+        # so a round only pays for what is actually new.
+        try:
+            import os
+
+            from .tagging import tag_all
+
+            cfg = os.path.join(
+                os.path.dirname(os.path.abspath(db_path)),
+                "mm1031.config.json",
+            )
+            log("tags: %s" % tag_all(
+                db_path, content=True,
+                config_path=cfg if os.path.exists(cfg) else None))
+        except Exception as exc:  # tagging must never stop the watch
+            log("tagging failed: %r" % exc)
         if background_previews:
             proc = (state or {}).get("previews_proc")
             if proc is not None and proc.poll() is None:

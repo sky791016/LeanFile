@@ -50,6 +50,7 @@ enum Section: String, CaseIterable, Identifiable {
     case conversations = "conversations"
     case inbox = "inbox"
     case library = "library"
+    case tags = "tags"
     case finals = "finals"
     case nodes = "nodes"
     case cleanup = "cleanup"
@@ -63,6 +64,7 @@ enum Section: String, CaseIterable, Identifiable {
         case .conversations: return "conversations"
         case .inbox: return "inbox"
         case .library: return "library"
+        case .tags: return "tags"
         case .finals: return "finals"
         case .nodes: return "nodes"
         case .cleanup: return "cleanup"
@@ -76,6 +78,7 @@ enum Section: String, CaseIterable, Identifiable {
         case .conversations: return "text.bubble"
         case .inbox: return "tray.full"
         case .library: return "books.vertical"
+        case .tags: return "tag.fill"
         case .finals: return "checkmark.seal"
         case .nodes: return "externaldrive.connected.to.line.below"
         case .cleanup: return "trash"
@@ -114,6 +117,9 @@ final class Store: ObservableObject {
     @Published var conversation = (tool: "", model: "", title: "", inferred: false, prompt: "")
     @Published var searchText: String = ""
     @Published var sortMode: String = "latest"
+    @Published var tagFacets: [(dim: String, tag: String, count: Int)] = []
+    @Published var selectedTags: Set<String> = []
+    @Published var organizeResult: String = ""
 
     private var db: Database?
     // All database work runs on this serial queue, never on the main
@@ -193,7 +199,7 @@ final class Store: ObservableObject {
             section: section, search: searchText,
             preset: timePreset, day: selectedDay,
             conv: selectedConversationId, asset: selectedAssetId,
-            sort: sortMode
+            sort: sortMode, tags: selectedTags
         )
         let range = Store.rangeFor(preset: snap.preset, day: snap.day)
         queue.async { [weak self] in
@@ -207,6 +213,7 @@ final class Store: ObservableObject {
             var dashFiles: [AssetRow] = []
             var dashTotal = 0
             var merged: [String: String]?
+            var newFacets: [(dim: String, tag: String, count: Int)]?
             var preview = (stale: 0, dedup: 0, ephemeral: 0)
             switch snap.section {
             case .dashboard:
@@ -239,6 +246,18 @@ final class Store: ObservableObject {
                 )
             case .about:
                 break
+            case .tags:
+                newFacets = db.tagFacets()
+                if snap.tags.isEmpty {
+                    newAssets = []
+                } else {
+                    let pairs = snap.tags.map { k -> (String, String) in
+                        let parts = k.split(separator: "\t", maxSplits: 1)
+                        return (String(parts[0]),
+                                parts.count > 1 ? String(parts[1]) : "")
+                    }
+                    newAssets = db.assetsByTags(pairs: pairs)
+                }
             case .inbox, .library, .finals, .nodes, .cleanup:
                 newAssets = db.assets(
                     section: snap.section.key, search: snap.search,
@@ -260,6 +279,7 @@ final class Store: ObservableObject {
                 self.dashFiles = dashFiles
                 self.dashTotal = dashTotal
                 if let newAssets { self.assets = newAssets }
+                if let newFacets { self.tagFacets = newFacets }
                 if let merged {
                     self.rules = merged
                     self.cleanupPreview = preview
@@ -277,6 +297,55 @@ final class Store: ObservableObject {
         let work = DispatchWorkItem { [weak self] in self?.reload() }
         searchWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: work)
+    }
+
+    // MARK: - Tags & auto-filing
+
+    func toggleTag(_ dim: String, _ tag: String) {
+        let k = dim + "\t" + tag
+        if selectedTags.contains(k) { selectedTags.remove(k) }
+        else { selectedTags.insert(k) }
+        reload()
+    }
+
+    func clearTags() {
+        selectedTags = []
+        reload()
+    }
+
+    func runTagAll() {
+        cli(["tag-all", "--content"]) { [weak self] out in
+            self?.organizeResult = out
+        }
+    }
+
+    private func organizeNodeName() -> String {
+        if let n = rules["organize_node"], !n.isEmpty { return n }
+        return nodes.first?.name ?? ""
+    }
+
+    private func organizeTargetRoot() -> String {
+        let raw = rules["organize_root"] ?? ""
+        if !raw.isEmpty { return (raw as NSString).expandingTildeInPath }
+        return FileManager.default.homeDirectoryForCurrentUser.path
+            + "/LeanFile-Library"
+    }
+
+    func runOrganizePlan() {
+        cli(["organize-plan", organizeNodeName(),
+             "--to", organizeTargetRoot()]) { [weak self] out in
+            self?.organizeResult = out
+        }
+    }
+
+    func runOrganizeExecute() {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        cli(["organize-run", organizeNodeName(),
+             "--to", organizeTargetRoot(),
+             "--manifest", home + "/mm1031-dev/organize-manifest.json",
+             "--yes"]) { [weak self] out in
+            self?.organizeResult = out
+        }
     }
 
     func select(section newSection: Section) {
@@ -515,6 +584,7 @@ struct ContentView: View {
         case .conversations: return store.counts.convs
         case .inbox: return store.counts.inbox
         case .library: return store.counts.total
+        case .tags: return 0
         case .finals: return store.counts.finals
         case .cleanup: return store.counts.dups
         case .nodes: return store.nodes.count
@@ -534,6 +604,81 @@ struct ContentView: View {
             }
         )) { a in
             AssetRowView(asset: a).tag(a.id)
+        }
+    }
+
+    private var tagDimOrder: [String] {
+        ["category", "time", "content", "project", "type", "ext",
+         "importance"]
+    }
+
+    private func tagChip(dim: String, tag: String, count: Int) -> some View {
+        let selected = store.selectedTags.contains(dim + "\t" + tag)
+        return Button { store.toggleTag(dim, tag) } label: {
+            Text("\(tag) · \(count)")
+                .font(.caption).lineLimit(1)
+                .padding(.horizontal, 8).padding(.vertical, 4)
+                .background(selected ? Color.brandBlue
+                                     : Color.gray.opacity(0.15))
+                .foregroundStyle(selected ? Color.white : Color.primary)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var tagsView: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text(L.t("tags.title")).font(.headline)
+                        Spacer()
+                        if !store.selectedTags.isEmpty {
+                            Text(L.f("tags.selected",
+                                     store.selectedTags.count))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Button(L.t("tags.clear")) { store.clearTags() }
+                                .font(.caption)
+                        }
+                    }
+                    if store.selectedTags.isEmpty {
+                        Text(L.t("tags.hint"))
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    ForEach(tagDimOrder, id: \.self) { dim in
+                        let items = store.tagFacets.filter { $0.dim == dim }
+                        if !items.isEmpty {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(L.t("tags.dim." + dim))
+                                    .font(.caption2).bold()
+                                    .foregroundStyle(.secondary)
+                                ScrollView(.horizontal,
+                                           showsIndicators: false) {
+                                    HStack(spacing: 6) {
+                                        ForEach(items, id: \.tag) { it in
+                                            tagChip(dim: dim, tag: it.tag,
+                                                    count: it.count)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(10)
+            }
+            .background(Color(nsColor: .textBackgroundColor))
+            .frame(maxHeight: 320)
+            Divider()
+            if store.selectedTags.isEmpty {
+                Spacer()
+                Text(L.t("tags.emptyPick"))
+                    .foregroundStyle(.secondary)
+                Spacer()
+            } else {
+                assetListView
+            }
         }
     }
 
@@ -609,6 +754,8 @@ struct ContentView: View {
                 }
                 .padding(.vertical, 2)
             }
+        case .tags:
+            tagsView
         case .library:
             VStack(spacing: 0) {
                 HStack(spacing: 8) {
@@ -1083,6 +1230,38 @@ struct RulesView: View {
                 if let last = store.rules["last_cleanup"] {
                     Text(L.f("rules.lastFmt", last))
                         .font(.caption2).foregroundStyle(.tertiary)
+                }
+            }
+            SwiftUI.Section(L.t("organize.title")) {
+                Toggle(L.t("organize.auto"),
+                       isOn: boolBinding("organize_enabled"))
+                Picker(L.t("organize.node"), selection: Binding(
+                    get: { store.rules["organize_node"]
+                        ?? store.nodes.first?.name ?? "" },
+                    set: { store.setRule("organize_node", $0) }
+                )) {
+                    ForEach(store.nodes, id: \.name) { n in
+                        Text(n.name).tag(n.name)
+                    }
+                }
+                TextField(L.t("organize.root"), text: Binding(
+                    get: { store.rules["organize_root"]
+                        ?? "~/LeanFile-Library" },
+                    set: { store.setRule("organize_root", $0) }
+                ))
+                Text(L.t("organize.note"))
+                    .font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    Button(L.t("organize.plan")) { store.runOrganizePlan() }
+                    Button(L.t("organize.run")) {
+                        store.runOrganizeExecute()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    Button(L.t("organize.retag")) { store.runTagAll() }
+                }
+                if !store.organizeResult.isEmpty {
+                    Text(store.organizeResult)
+                        .font(.caption).foregroundStyle(.secondary)
                 }
             }
         }
@@ -1618,6 +1797,12 @@ private enum SelfShot {
         await wait(1.5); snap("shot-about.png")
         store.select(section: .rules)
         await wait(1.5); snap("shot-rules.png")
+        store.select(section: .tags)
+        await wait(1.5); snap("shot-tags.png")
+        if let first = store.tagFacets.first(where: { $0.dim == "category" }) {
+            store.toggleTag("category", first.tag)
+        }
+        await wait(1.5); snap("shot-tags-filtered.png")
         let mainWin = NSApp.windows.first(where: { $0.contentView != nil })
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         await wait(1.4)

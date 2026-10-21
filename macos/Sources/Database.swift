@@ -166,6 +166,37 @@ final class Database {
         }
     }
 
+    func tagFacets() -> [(dim: String, tag: String, count: Int)] {
+        let sql = """
+            SELECT dim, tag, COUNT(DISTINCT asset_id) FROM tags
+            GROUP BY dim, tag ORDER BY dim, COUNT(DISTINCT asset_id) DESC
+            """
+        return query(sql).map {
+            (dim: $0[0], tag: $0[1], count: Int($0[2]) ?? 0)
+        }
+    }
+
+    /// Assets matching ALL given (dim, tag) pairs — AND across pairs,
+    /// newest activity first. The combination rule behind the Tags page.
+    func assetsByTags(pairs: [(String, String)]) -> [AssetRow] {
+        var cond = "1=1"
+        var binds: [String] = []
+        for (dim, tag) in pairs {
+            cond += " AND EXISTS (SELECT 1 FROM tags t WHERE " +
+                "t.asset_id=a.id AND t.dim=? AND t.tag=?)"
+            binds += [dim, tag]
+        }
+        let sql = """
+            SELECT a.id, a.name, a.project, a.atype, a.state, a.in_inbox,
+                   COALESCE((SELECT MAX(seq) FROM versions v WHERE v.asset_id=a.id),1)
+            FROM assets a WHERE \(cond) ORDER BY \(latestExpr) DESC LIMIT 500
+            """
+        return query(sql, binds: binds).map {
+            AssetRow(id: $0[0], name: $0[1], project: $0[2], atype: $0[3],
+                     state: $0[4], inbox: $0[5] == "1", latestSeq: Int($0[6]) ?? 1)
+        }
+    }
+
     func versions(assetId: String) -> [VersionRow] {
         let sql = """
             SELECT v.id, v.seq, v.blob_hash, v.author,
