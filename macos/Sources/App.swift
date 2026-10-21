@@ -14,28 +14,29 @@ struct GuicangApp: App {
         .windowStyle(.titleBar)
 
         MenuBarExtra("归藏", systemImage: "archivebox.fill") {
-            Button("打开主窗口 Open") {
+            Button(L.t("menu.open")) {
                 NSApp.activate(ignoringOtherApps: true)
             }
             Divider()
-            Text("待处理 To Review：\(store.counts.inbox)")
-            Text("文件总数 Files：\(store.counts.total)")
+            Text(L.f("menu.toreview", store.counts.inbox))
+            Text(L.f("menu.files", store.counts.total))
             Divider()
-            Button("退出归藏 Quit") { NSApp.terminate(nil) }
+            Button(L.t("menu.quit")) { NSApp.terminate(nil) }
         }
     }
 }
 
 enum Section: String, CaseIterable, Identifiable {
-    case dashboard = "总览 Dashboard"
-    case conversations = "对话 Conversations"
-    case inbox = "待处理 To Review"
-    case library = "全部文件 All Files"
-    case finals = "正式文件 Finals"
-    case nodes = "存放位置 Storage"
-    case cleanup = "重复文件 Duplicates"
-    case rules = "自动规则 Auto Rules"
+    case dashboard = "dashboard"
+    case conversations = "conversations"
+    case inbox = "inbox"
+    case library = "library"
+    case finals = "finals"
+    case nodes = "nodes"
+    case cleanup = "cleanup"
+    case rules = "rules"
     var id: String { rawValue }
+    var title: String { L.t("section." + key) }
     var key: String {
         switch self {
         case .dashboard: return "dashboard"
@@ -326,7 +327,7 @@ final class Store: ObservableObject {
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
                 result = String(data: data, encoding: .utf8) ?? ""
             } catch {
-                result = "执行失败: \(error.localizedDescription)"
+                result = "\(L.t("store.cleanupFailed")): \(error.localizedDescription)"
             }
             DispatchQueue.main.async {
                 self.cleanupResult = result
@@ -345,7 +346,7 @@ struct ContentView: View {
                 get: { store.section },
                 set: { if let s = $0 { store.select(section: s) } }
             )) { s in
-                Label(s.rawValue, systemImage: s.icon)
+                Label(s.title, systemImage: s.icon)
                     .badge(badge(for: s))
                     .tag(s)
             }
@@ -359,7 +360,7 @@ struct ContentView: View {
                 inspector
             }
         }
-        .searchable(text: $store.searchText, prompt: "搜索文件名或内容 Search")
+        .searchable(text: $store.searchText, prompt: L.t("search.prompt"))
         .onChange(of: store.searchText) { _, _ in store.searchChanged() }
     }
 
@@ -402,13 +403,13 @@ struct ContentView: View {
                let conv = store.conversationsList.first(where: { $0.id == cid }) {
                 VStack(spacing: 0) {
                     HStack(spacing: 10) {
-                        Button("← 全部对话 All") {
+                        Button(L.t("conv.back")) {
                             store.selectedConversationId = nil
                             store.reload()
                         }
                         Text(conv.title).font(.headline).lineLimit(1)
                         Spacer()
-                        Text("这次对话产出 \(conv.files) 个文件")
+                        Text(L.f("conv.produced", conv.files))
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     .padding(8)
@@ -422,7 +423,7 @@ struct ContentView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(c.title).font(.headline).lineLimit(1)
-                            Text("\(c.tool.isEmpty ? "对话 Conversation" : c.tool) · \(c.files) 个文件 Files · \(humanBytes(c.bytes))" + (c.inferred ? " · 推断 Inferred" : " · 实录 Recorded"))
+                            Text("\(c.tool.isEmpty ? L.t("conv.toolFallback") : c.tool) · \(L.f("conv.files", c.files)) · \(humanBytes(c.bytes))" + (c.inferred ? " · " + L.t("tag.inferred") : " · " + L.t("tag.recorded")))
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         .padding(.vertical, 2)
@@ -435,7 +436,7 @@ struct ContentView: View {
             List(store.nodes) { n in
                 VStack(alignment: .leading, spacing: 3) {
                     Text(n.name).font(.headline)
-                    Text("\(n.kind) · \(n.files) 个文件 · \(humanBytes(n.bytes))")
+                    Text("\(n.kind) · \(L.f("conv.files", n.files)) · \(humanBytes(n.bytes))")
                         .font(.caption).foregroundStyle(.secondary)
                     Text(n.path).font(.caption2).foregroundStyle(.tertiary)
                 }
@@ -445,9 +446,9 @@ struct ContentView: View {
             List(store.dups) { d in
                 VStack(alignment: .leading, spacing: 3) {
                     Text(d.example).font(.headline)
-                    Text("\(d.copies) 份副本 · 每份 \(humanBytes(d.sizeEach)) · 可回收 \(humanBytes(d.wasted))")
+                    Text(L.f("dup.line", d.copies, humanBytes(d.sizeEach), humanBytes(d.wasted)))
                         .font(.caption).foregroundStyle(.secondary)
-                    Text("哈希 \(String(d.hash.prefix(12)))")
+                    Text(L.f("dup.hash", String(d.hash.prefix(12))))
                         .font(.caption2).foregroundStyle(.tertiary)
                 }
                 .padding(.vertical, 2)
@@ -463,7 +464,7 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
                     if store.drillTitle != nil {
-                        Button("← 返回文件清单 Back to list") {
+                        Button(L.t("insp.back")) {
                             store.detailShowsDrill = true
                         }
                         .font(.caption)
@@ -472,7 +473,7 @@ struct ContentView: View {
                         Text(a.name).font(.title3).bold()
                         StatePill(state: a.state)
                     }
-                    Text("\(a.project) · \(a.atype) · 最新 v\(a.latestSeq)")
+                    Text("\(a.project) · \(L.typeName(a.atype)) · \(L.f("insp.latestFmt", a.latestSeq))")
                         .font(.caption).foregroundStyle(.secondary)
                     if !store.preview.thumb.isEmpty,
                        let img = NSImage(contentsOfFile: store.preview.thumb) {
@@ -492,17 +493,17 @@ struct ContentView: View {
                     let conv = store.conversation
                     if !conv.title.isEmpty || !conv.tool.isEmpty {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("来源 Source · 来自哪次对话").font(.headline)
+                            Text(L.t("insp.source")).font(.headline)
                             if !conv.title.isEmpty {
-                                Text(conv.title + (conv.inferred ? " (Inferred 推断)" : ""))
+                                Text(conv.title + (conv.inferred ? L.t("insp.inferredTag") : ""))
                                     .font(.subheadline)
                             }
                             if !conv.tool.isEmpty {
-                                Text("工具 Tool：\(conv.tool)" + (conv.model.isEmpty ? "" : " · 模型 Model：\(conv.model)"))
+                                Text(L.f("insp.toolFmt", conv.tool) + (conv.model.isEmpty ? "" : L.f("insp.modelFmt", conv.model)))
                                     .font(.caption).foregroundStyle(.secondary)
                             }
                             if !conv.prompt.isEmpty {
-                                Text("提示词 Prompt：\(conv.prompt)")
+                                Text(L.f("insp.promptFmt", conv.prompt))
                                     .font(.caption).foregroundStyle(.secondary).lineLimit(4)
                             }
                         }
@@ -512,15 +513,15 @@ struct ContentView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     if a.state != "final" && a.state != "published" {
-                        Button("设为正式版 Set as Final") { store.promoteSelected() }
+                        Button(L.t("insp.setFinal")) { store.promoteSelected() }
                             .buttonStyle(.borderedProminent)
                     }
                     Divider()
-                    Text("历史版本 Version History").font(.headline)
+                    Text(L.t("insp.versions")).font(.headline)
                     ForEach(store.versions) { v in
                         VStack(alignment: .leading, spacing: 2) {
                             Text("v\(v.seq) · \(v.shortHash)").font(.subheadline).bold()
-                            Text("作者 Author \(v.author)" + (v.tool.isEmpty ? "" : " · 工具 Tool \(v.tool)") + (v.model.isEmpty ? "" : " · 模型 Model \(v.model)"))
+                            Text(L.f("insp.authorFmt", v.author) + (v.tool.isEmpty ? "" : L.f("insp.vToolFmt", v.tool)) + (v.model.isEmpty ? "" : L.f("insp.vModelFmt", v.model)))
                                 .font(.caption).foregroundStyle(.secondary)
                             if !v.intent.isEmpty {
                                 Text(v.intent).font(.caption).foregroundStyle(.secondary)
@@ -529,7 +530,7 @@ struct ContentView: View {
                         .padding(.vertical, 2)
                     }
                     Divider()
-                    Text("存放在哪 Stored In").font(.headline)
+                    Text(L.t("insp.storedIn")).font(.headline)
                     ForEach(Array(store.locations.enumerated()), id: \.offset) { _, loc in
                         VStack(alignment: .leading, spacing: 1) {
                             Text(loc.node).font(.subheadline)
@@ -537,7 +538,7 @@ struct ContentView: View {
                         }
                     }
                     if let first = store.locations.first {
-                        Button("在 Finder 中显示 Show in Finder") {
+                        Button(L.t("insp.showInFinder")) {
                             NSWorkspace.shared.activateFileViewerSelecting(
                                 [URL(fileURLWithPath: first.path)]
                             )
@@ -550,7 +551,7 @@ struct ContentView: View {
         } else {
             VStack(spacing: 8) {
                 Image(systemName: "archivebox").font(.largeTitle).foregroundStyle(.tertiary)
-                Text("选择一个文件，查看它的历史版本和来源\nSelect a file to see its versions and source")
+                Text(L.t("insp.empty"))
                     .multilineTextAlignment(.center).foregroundStyle(.secondary)
             }
         }
@@ -596,11 +597,11 @@ struct StatePill: View {
     }
     private var label: String {
         switch state {
-        case "draft": return "草稿 Draft"
-        case "candidate": return "备选版 Candidate"
-        case "final": return "正式版 Final"
-        case "published": return "已发布 Published"
-        case "archived": return "已归档 Archived"
+        case "draft": return L.t("state.draft")
+        case "candidate": return L.t("state.candidate")
+        case "final": return L.t("state.final")
+        case "published": return L.t("state.published")
+        case "archived": return L.t("state.archived")
         default: return state
         }
     }
@@ -632,65 +633,65 @@ struct DashboardView: View {
                     columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
                     spacing: 10
                 ) {
-                    Button { store.openDrill(title: "全部文件 All Files") } label: {
-                        StatCard(title: "文件总数 Files", value: "\(store.dash.totalFiles)",
-                                 sub: "物理副本 \(store.dash.totalCopies) 份 · 点开看清单")
+                    Button { store.openDrill(title: L.t("drill.all")) } label: {
+                        StatCard(title: L.t("card.files"), value: "\(store.dash.totalFiles)",
+                                 sub: L.f("card.filesSub", store.dash.totalCopies))
                     }.buttonStyle(.plain)
-                    Button { store.openDrill(title: "全部文件 All Files") } label: {
-                        StatCard(title: "占用空间 Space", value: humanBytes(store.dash.totalBytes),
-                                 sub: "含全部副本")
+                    Button { store.openDrill(title: L.t("drill.all")) } label: {
+                        StatCard(title: L.t("card.space"), value: humanBytes(store.dash.totalBytes),
+                                 sub: L.t("card.spaceSub"))
                     }.buttonStyle(.plain)
                     Button { store.select(section: .conversations) } label: {
-                        StatCard(title: "对话 Conversations", value: "\(store.dash.conversations)",
-                                 sub: "次生成会话 · 点开查看")
+                        StatCard(title: L.t("card.conv"), value: "\(store.dash.conversations)",
+                                 sub: L.t("card.convSub"))
                     }.buttonStyle(.plain)
-                    Button { store.openDrill(title: "正式版 Finals", finals: true) } label: {
-                        StatCard(title: "正式版 Finals", value: "\(store.dash.finals)",
-                                 sub: "已拍板的文件")
+                    Button { store.openDrill(title: L.t("drill.finals"), finals: true) } label: {
+                        StatCard(title: L.t("card.finals"), value: "\(store.dash.finals)",
+                                 sub: L.t("card.finalsSub"))
                     }.buttonStyle(.plain)
                     Button { store.select(section: .cleanup) } label: {
-                        StatCard(title: "可回收 Reclaimable", value: humanBytes(store.dash.reclaimable),
-                                 sub: "重复副本占用 · 点开处理")
+                        StatCard(title: L.t("card.reclaim"), value: humanBytes(store.dash.reclaimable),
+                                 sub: L.t("card.reclaimSub"))
                     }.buttonStyle(.plain)
-                    Button { store.openDrill(title: "重要文件 Protected", protect: true) } label: {
-                        StatCard(title: "重要文件 Protected", value: "\(store.dash.protectTotal)",
+                    Button { store.openDrill(title: L.t("drill.protect"), protect: true) } label: {
+                        StatCard(title: L.t("card.protect"), value: "\(store.dash.protectTotal)",
                                  sub: store.dash.protectAtRisk > 0
-                                    ? "⚠️ \(store.dash.protectAtRisk) 个只有一份副本"
-                                    : "全都有备份")
+                                    ? L.f("card.protectRisk", store.dash.protectAtRisk)
+                                    : L.t("card.protectOk"))
                     }.buttonStyle(.plain)
                 }
                 .padding(.vertical, 4)
             }
-            SwiftUI.Section("按分类 By Category（点一行下钻）") {
+            SwiftUI.Section(L.t("dash.byCategory")) {
                 ForEach(store.dash.byCategory) { r in
                     Button {
                         store.openDrill(
-                            title: "分类 Category · \(r.label)",
+                            title: L.f("drill.categoryFmt", L.cat(r.label)),
                             category: r.label == "未分类" ? "" : r.label
                         )
                     } label: {
-                        breakdownRow(r, maxBytes: store.dash.byCategory.map(\.bytes).max() ?? 1)
+                        breakdownRow(r, display: L.cat(r.label), maxBytes: store.dash.byCategory.map(\.bytes).max() ?? 1)
                     }.buttonStyle(.plain)
                 }
             }
-            SwiftUI.Section("按类型 By Type（点一行下钻）") {
+            SwiftUI.Section(L.t("dash.byType")) {
                 ForEach(store.dash.byType) { r in
                     Button {
-                        store.openDrill(title: "类型 Type · \(r.label)", type: r.label)
+                        store.openDrill(title: L.f("drill.typeFmt", L.typeName(r.label)), type: r.label)
                     } label: {
-                        breakdownRow(r, maxBytes: store.dash.byType.map(\.bytes).max() ?? 1)
+                        breakdownRow(r, display: L.typeName(r.label), maxBytes: store.dash.byType.map(\.bytes).max() ?? 1)
                     }.buttonStyle(.plain)
                 }
             }
-            SwiftUI.Section("按时间 Time") {
-                Picker("范围 Range", selection: Binding(
+            SwiftUI.Section(L.t("dash.time")) {
+                Picker(L.t("time.range"), selection: Binding(
                     get: { store.timePreset },
                     set: { store.setPreset($0) }
                 )) {
-                    Text("全部 All").tag("all")
-                    Text("今天 Today").tag("today")
-                    Text("近7天 7d").tag("week")
-                    Text("近30天 30d").tag("month")
+                    Text(L.t("range.all")).tag("all")
+                    Text(L.t("range.today")).tag("today")
+                    Text(L.t("range.week")).tag("week")
+                    Text(L.t("range.month")).tag("month")
                 }
                 .pickerStyle(.segmented)
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -717,13 +718,13 @@ struct DashboardView: View {
                 }
                 if let day = store.selectedDay {
                     HStack {
-                        Text("正在看 \(day) 这一天产出的文件").font(.caption)
+                        Text(L.f("time.viewingDay", day)).font(.caption)
                         Spacer()
-                        Button("清除 Clear") { store.setDay(nil) }
+                        Button(L.t("time.clear")) { store.setDay(nil) }
                     }
                 }
             }
-            SwiftUI.Section("文件清单 Files (\(store.dashTotal))") {
+            SwiftUI.Section(L.f("dash.filesFmt", store.dashTotal)) {
                 ForEach(store.dashFiles) { a in
                     AssetRowView(asset: a).tag(a.id)
                 }
@@ -731,12 +732,12 @@ struct DashboardView: View {
         }
     }
 
-    private func breakdownRow(_ r: BreakdownRow, maxBytes: Int) -> some View {
+    private func breakdownRow(_ r: BreakdownRow, display: String, maxBytes: Int) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack {
-                Text(r.label).font(.subheadline)
+                Text(display).font(.subheadline)
                 Spacer()
-                Text("\(r.files) 个 · \(humanBytes(r.bytes))")
+                Text(L.f("breakdown.fmt", r.files, humanBytes(r.bytes)))
                     .font(.caption).foregroundStyle(.secondary)
             }
             GeometryReader { g in
@@ -775,51 +776,51 @@ struct RulesView: View {
 
     var body: some View {
         List {
-            SwiftUI.Section("过期过程版本 Process Versions") {
-                Toggle("自动清理过程版本 Auto-clean old versions",
+            SwiftUI.Section(L.t("rules.secStale")) {
+                Toggle(L.t("rules.autoStale"),
                        isOn: boolBinding("stale_versions_enabled"))
-                Picker("过程版本保留天数 Keep process versions",
+                Picker(L.t("rules.keepDays"),
                        selection: intBinding("stale_versions_days", 30)) {
                     ForEach([7, 14, 30, 90], id: \.self) { d in
-                        Text("\(d) 天 days").tag(d)
+                        Text(L.f("days.fmt", d)).tag(d)
                     }
                 }
-                Text("只清旧版本的文件：当前版本、正式版永不动；原地编辑过的文件不会因为旧版本被清而丢当前内容。")
+                Text(L.t("rules.staleNote"))
                     .font(.caption).foregroundStyle(.secondary)
             }
-            SwiftUI.Section("重复与临时文件 Duplicates & Temp") {
-                Toggle("重复副本自动隔离 Auto-quarantine duplicate copies",
+            SwiftUI.Section(L.t("rules.secDup")) {
+                Toggle(L.t("rules.autoDup"),
                        isOn: boolBinding("dedup_enabled"))
-                Toggle("临时文件自动清理 Auto-clean temp files",
+                Toggle(L.t("rules.autoTemp"),
                        isOn: boolBinding("ephemeral_enabled"))
-                Text("重复副本永远保留最好的一份在原地，其余移入隔离区。")
+                Text(L.t("rules.dupNote"))
                     .font(.caption).foregroundStyle(.secondary)
             }
-            SwiftUI.Section("隔离区 Quarantine") {
-                Picker("隔离区保留天数 Retention",
+            SwiftUI.Section(L.t("rules.secQuar")) {
+                Picker(L.t("rules.retention"),
                        selection: intBinding("quarantine_retention_days", 30)) {
                     ForEach([7, 30, 90], id: \.self) { d in
-                        Text("\(d) 天后彻底删除").tag(d)
+                        Text(L.f("rules.retentionOpt", d)).tag(d)
                     }
                 }
-                Text("隔离区里的文件随时可恢复；只有超过保留天数的才彻底删除。")
+                Text(L.t("rules.quarNote"))
                     .font(.caption).foregroundStyle(.secondary)
             }
-            SwiftUI.Section("按当前规则的预览 Preview") {
-                LabeledContent("过期过程版本 Stale versions",
-                               value: "\(store.cleanupPreview.stale) 个")
-                LabeledContent("多余重复副本 Duplicate copies",
-                               value: "\(store.cleanupPreview.dedup) 个")
-                LabeledContent("临时/中间文件 Temp files",
-                               value: "\(store.cleanupPreview.ephemeral) 个")
-                Button("立即按规则执行 Run Now") { store.runCleanup() }
+            SwiftUI.Section(L.t("rules.secPreview")) {
+                LabeledContent(L.t("rules.prevStale"),
+                               value: L.f("count.fmt", store.cleanupPreview.stale))
+                LabeledContent(L.t("rules.prevDup"),
+                               value: L.f("count.fmt", store.cleanupPreview.dedup))
+                LabeledContent(L.t("rules.prevTemp"),
+                               value: L.f("count.fmt", store.cleanupPreview.ephemeral))
+                Button(L.t("rules.run")) { store.runCleanup() }
                     .buttonStyle(.borderedProminent)
                 if !store.cleanupResult.isEmpty {
                     Text(store.cleanupResult)
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let last = store.rules["last_cleanup"] {
-                    Text("上次执行 Last run: \(last)")
+                    Text(L.f("rules.lastFmt", last))
                         .font(.caption2).foregroundStyle(.tertiary)
                 }
             }
@@ -860,15 +861,15 @@ struct DrillView: View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(store.drillTitle ?? "文件清单 Files")
+                    Text(store.drillTitle ?? L.t("drill.defaultTitle"))
                         .font(.headline).lineLimit(1)
-                    Text("\(store.drillFiles.count) 个文件 Files")
+                    Text(L.f("drill.countFmt", store.drillFiles.count))
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Picker("", selection: $mode) {
-                    Text("列表 List").tag("list")
-                    Text("预览图 Grid").tag("grid")
+                    Text(L.t("drill.list")).tag("list")
+                    Text(L.t("drill.grid")).tag("grid")
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 170)
