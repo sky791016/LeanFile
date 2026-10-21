@@ -405,6 +405,7 @@ struct ContentView: View {
         }
         .searchable(text: $store.searchText, prompt: L.t("search.prompt"))
         .onChange(of: store.searchText) { _, _ in store.searchChanged() }
+        .onAppear { SelfShot.kick(store: store) }
     }
 
     private func badge(for s: Section) -> Int {
@@ -1032,5 +1033,53 @@ struct DrillTile: View {
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+
+// MARK: - Self-shot mode (LEANFILE_SHOTS=<dir>): renders the app's own
+// window to PNGs for documentation/QA, independent of screen lock state.
+private enum SelfShot {
+    static func kick(store: Store) {
+        guard let dir = ProcessInfo.processInfo.environment["LEANFILE_SHOTS"],
+              !dir.isEmpty else { return }
+        Task { @MainActor in await run(store: store, dir: dir) }
+    }
+
+    @MainActor
+    private static func run(store: Store, dir: String) async {
+        try? FileManager.default.createDirectory(
+            atPath: dir, withIntermediateDirectories: true)
+        if let win = NSApp.windows.first(where: { $0.contentView != nil }) {
+            win.setFrame(NSRect(x: 60, y: 60, width: 1500, height: 940),
+                         display: true)
+        }
+        func snap(_ name: String) {
+            guard let win = NSApp.windows.first(where: { $0.contentView != nil }),
+                  let view = win.contentView,
+                  let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds)
+            else { return }
+            view.cacheDisplay(in: view.bounds, to: rep)
+            if let data = rep.representation(using: .png, properties: [:]) {
+                try? data.write(to: URL(fileURLWithPath: dir + "/" + name))
+            }
+        }
+        func wait(_ s: Double) async {
+            try? await Task.sleep(nanoseconds: UInt64(s * 1_000_000_000))
+        }
+        await wait(2.2); snap("shot-dashboard.png")
+        store.openDrill(title: L.f("drill.categoryFmt", L.cat("表格数据")),
+                        category: "表格数据")
+        await wait(1.8); snap("shot-drill.png")
+        store.closeDrill()
+        store.select(section: .conversations)
+        await wait(1.5); snap("shot-conversations.png")
+        if let c = store.conversationsList.first {
+            store.selectConversation(c)
+        }
+        await wait(1.5); snap("shot-conversation.png")
+        store.select(section: .rules)
+        await wait(1.5); snap("shot-rules.png")
+        store.select(section: .dashboard)
     }
 }

@@ -69,6 +69,11 @@
   .lbl{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:1px}
   .lbl.p{background:#FDEEE3;color:#9C4A2F}.lbl.f{background:#E8F0F9;color:#0B2B4B}
   .card p.pain{margin-bottom:8px}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+  .shots figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .shots img{width:100%;display:block}
+  .shots figcaption{padding:10px 14px;font-size:13.5px;color:var(--mut)}
+  @media (min-width:900px){.shots .wide{grid-column:span 2}}
 .road span{background:#fff;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:7px 16px;font-size:13.5px}
 </style>
 </head>
@@ -166,9 +171,24 @@
   </div>
 </section>
 
+<section id="shots">
+  <div class="wrap">
+    <h2 data-i18n="shots.title">The real thing</h2>
+    <p class="lede" data-i18n="shots.lede">Screenshots from the running app, on its first user's live registry — 2,056 files:</p>
+    <div class="shots">
+      <figure><img src="img/shots/pub-dashboard.png" alt="LeanFile dashboard"><figcaption data-i18n="shot.1">Dashboard — totals, category & type breakdowns, production by day.</figcaption></figure>
+      <figure><img src="img/shots/pub-conversation.png" alt="Conversation files"><figcaption data-i18n="shot.2">One conversation's output — with one-click bundle export.</figcaption></figure>
+      <figure class="wide"><img src="img/shots/pub-drill.png" alt="Drill-down"><figcaption data-i18n="shot.3">Click a category and its files appear on the right — drill-down, list or thumbnail grid.</figcaption></figure>
+      <figure><img src="img/shots/pub-rules.png" alt="Auto rules"><figcaption data-i18n="shot.4">Auto rules — off by default; you switch on what LeanFile may do.</figcaption></figure>
+      <figure><img src="img/shots/pub-conversations.png" alt="Conversations"><figcaption data-i18n="shot.5">224 conversations — files remembered the way you remember them.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
 <section id="bench">
   <div class="wrap">
-    <h2 data-i18n="bench.title">Measured, not promised</h2>
+    <h2 data-i18n="shots.title":"真实系统截图","shots.lede":"来自运行中应用的真实截图，第一位用户的真实登记库——2,056 个文件：","shot.1":"总览——文件总数、分类与类型构成、按日产出。","shot.2":"一次对话的全部产出——右上角一键打包导出。","shot.3":"点任意分类，该类文件立即出现在右侧——下钻，列表与预览图可切换。","shot.4":"自动规则——默认全关，开哪条，LeanFile 才做哪条。","shot.5":"224 次对话——按你回想文件的方式组织文件。",
+    "bench.title">Measured, not promised</h2>
     <p class="lede" data-i18n="bench.lede">Engine benchmarks on a synthetic fragmented corpus — 25,325 files: variant groups, duplicate pairs, shard sets, and noise.</p>
     <table>
       <tr><th data-i18n="bench.h1">Operation</th><th data-i18n="bench.h2">Result</th></tr>

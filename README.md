@@ -154,6 +154,23 @@ preview-thumbnail grid. Full previews (Quick Look thumbnails, text
 excerpts) and source-conversation cards make every file legible at a
 glance.
 
+## Screenshots
+
+Real captures from the running app (the first user's live registry:
+2,056 files):
+
+![Dashboard](docs/img/shots/en/pub-dashboard.png)
+*Dashboard — totals, category/type breakdowns, production by day.*
+
+![Drill-down](docs/img/shots/en/pub-drill.png)
+*Click a category and its files appear on the right (drill-down).*
+
+![A conversation's files](docs/img/shots/en/pub-conversation.png)
+*One conversation's output, with one-click bundle export.*
+
+![Auto rules](docs/img/shots/en/pub-rules.png)
+*Auto rules — off by default; you switch on what LeanFile may do.*
+
 ## Architecture
 
 - **Core engine (Python, platform-independent)** — content-hash
