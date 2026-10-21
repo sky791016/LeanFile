@@ -113,19 +113,52 @@ final class Store: ObservableObject {
     @Published var preview = (thumb: "", excerpt: "", title: "")
     @Published var conversation = (tool: "", model: "", title: "", inferred: false, prompt: "")
     @Published var searchText: String = ""
+    @Published var sortMode: String = "latest"
 
     private var db: Database?
     // All database work runs on this serial queue, never on the main
     // thread: the UI must never freeze waiting for SQLite.
     private let queue = DispatchQueue(label: "tech.mm1031.store", qos: .userInitiated)
     private var searchWork: DispatchWorkItem?
+    // Realtime sync: the watcher process updates the db file as new
+    // files are ingested; poll its mtime and reload when it changes
+    // (but never while a cleanup-type CLI operation is running).
+    private var dbPath: String = ""
+    private var lastDbMtime: TimeInterval = 0
+    private var dbTimer: Timer?
+    private var cliOpsInFlight = 0
 
     init() {
         let env = (ProcessInfo.processInfo.environment["MM1031_DB"] ?? ProcessInfo.processInfo.environment["GUICANG_DB"])
         let home = FileManager.default.homeDirectoryForCurrentUser.path
         let path = env ?? (home + "/mm1031-dev/ky-live.db")
+        dbPath = path
         db = Database(path: path)
+        lastDbMtime = Store.dbFileMtime(path)
         reload()
+        dbTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            self?.pollDbFile()
+        }
+    }
+
+    private static func dbFileMtime(_ path: String) -> TimeInterval {
+        var latest: TimeInterval = 0
+        for p in [path, path + "-wal"] {
+            if let attrs = try? FileManager.default.attributesOfItem(atPath: p),
+               let d = attrs[.modificationDate] as? Date {
+                latest = max(latest, d.timeIntervalSince1970)
+            }
+        }
+        return latest
+    }
+
+    private func pollDbFile() {
+        guard cliOpsInFlight == 0 else { return }
+        let m = Store.dbFileMtime(dbPath)
+        if m > lastDbMtime {
+            lastDbMtime = m
+            reload()
+        }
     }
 
     static func rangeFor(preset: String, day: String?) -> (from: Double?, to: Double?) {
@@ -159,7 +192,8 @@ final class Store: ObservableObject {
         let snap = (
             section: section, search: searchText,
             preset: timePreset, day: selectedDay,
-            conv: selectedConversationId, asset: selectedAssetId
+            conv: selectedConversationId, asset: selectedAssetId,
+            sort: sortMode
         )
         let range = Store.rangeFor(preset: snap.preset, day: snap.day)
         queue.async { [weak self] in
@@ -206,7 +240,10 @@ final class Store: ObservableObject {
             case .about:
                 break
             case .inbox, .library, .finals, .nodes, .cleanup:
-                newAssets = db.assets(section: snap.section.key, search: snap.search)
+                newAssets = db.assets(
+                    section: snap.section.key, search: snap.search,
+                    sort: snap.section == .library ? snap.sort : "created"
+                )
             }
             var vers: [VersionRow] = []
             var locs: [(node: String, path: String)] = []
@@ -244,6 +281,12 @@ final class Store: ObservableObject {
 
     func select(section newSection: Section) {
         section = newSection
+        reload()
+    }
+
+    func setSortMode(_ mode: String) {
+        guard mode != sortMode else { return }
+        sortMode = mode
         reload()
     }
 
@@ -358,6 +401,7 @@ final class Store: ObservableObject {
     }
 
     func runCleanup() {
+        cliOpsInFlight += 1
         queue.async { [weak self] in
             guard let self, let db = self.db else { return }
             let home = FileManager.default.homeDirectoryForCurrentUser.path
@@ -382,6 +426,7 @@ final class Store: ObservableObject {
                 result = "\(L.t("store.cleanupFailed")): \(error.localizedDescription)"
             }
             DispatchQueue.main.async {
+                self.cliOpsInFlight -= 1
                 self.cleanupResult = result
                 self.reload()
             }
@@ -389,6 +434,7 @@ final class Store: ObservableObject {
     }
 
     private func cli(_ args: [String], done: @escaping (String) -> Void) {
+        cliOpsInFlight += 1
         queue.async { [weak self] in
             guard let self, let db = self.db else { return }
             let home = FileManager.default.homeDirectoryForCurrentUser.path
@@ -410,6 +456,7 @@ final class Store: ObservableObject {
                 result = "\(error.localizedDescription)"
             }
             DispatchQueue.main.async {
+                self.cliOpsInFlight -= 1
                 done(result)
                 self.reload()
             }
@@ -561,6 +608,27 @@ struct ContentView: View {
                         .font(.caption2).foregroundStyle(.tertiary)
                 }
                 .padding(.vertical, 2)
+            }
+        case .library:
+            VStack(spacing: 0) {
+                HStack(spacing: 8) {
+                    Text(L.t("sort.label"))
+                        .font(.caption).foregroundStyle(.secondary)
+                    Picker(L.t("sort.label"), selection: Binding(
+                        get: { store.sortMode },
+                        set: { store.setSortMode($0) }
+                    )) {
+                        Text(L.t("sort.latest")).tag("latest")
+                        Text(L.t("sort.size")).tag("size")
+                        Text(L.t("sort.name")).tag("name")
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    Spacer()
+                }
+                .padding(8)
+                Divider()
+                assetListView
             }
         default:
             assetListView

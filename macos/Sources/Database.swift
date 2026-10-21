@@ -134,7 +134,12 @@ final class Database {
         return sqlite3_step(stmt) == SQLITE_DONE
     }
 
-    func assets(section: String, search: String) -> [AssetRow] {
+    private var latestExpr: String {
+        "COALESCE((SELECT MAX(l.mtime) FROM locations l " +
+        "JOIN versions v ON v.blob_hash=l.hash WHERE v.asset_id=a.id), a.created)"
+    }
+
+    func assets(section: String, search: String, sort: String = "created") -> [AssetRow] {
         var whereClause = "1=1"
         if section == "inbox" { whereClause = "a.in_inbox=1" }
         if section == "finals" { whereClause = "a.state IN ('final','published')" }
@@ -143,10 +148,17 @@ final class Database {
             whereClause += " AND (a.name LIKE ? OR a.project LIKE ?)"
             binds = ["%" + search + "%", "%" + search + "%"]
         }
+        let order: String
+        switch sort {
+        case "latest": order = "\(latestExpr) DESC"
+        case "size": order = "\(sizeExpr) DESC"
+        case "name": order = "a.name ASC"
+        default: order = "a.created DESC"
+        }
         let sql = """
             SELECT a.id, a.name, a.project, a.atype, a.state, a.in_inbox,
                    COALESCE((SELECT MAX(seq) FROM versions v WHERE v.asset_id=a.id),1)
-            FROM assets a WHERE \(whereClause) ORDER BY a.created DESC LIMIT 500
+            FROM assets a WHERE \(whereClause) ORDER BY \(order) LIMIT 500
             """
         return query(sql, binds: binds).map {
             AssetRow(id: $0[0], name: $0[1], project: $0[2], atype: $0[3],

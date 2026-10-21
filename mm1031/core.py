@@ -22,22 +22,24 @@ def hash_file(path, chunk=1 << 20):
 
 def guess_type(path):
     ext = os.path.splitext(path)[1].lower()
-    if ext in (".md", ".txt", ".docx", ".pdf"):
+    if ext in (".md", ".txt", ".docx", ".doc", ".pdf", ".rtf", ".odt",
+               ".xlsx", ".xls", ".csv", ".tsv", ".numbers", ".ods"):
         return "document"
-    if ext in (".png", ".jpg", ".jpeg", ".webp", ".heic"):
+    if ext in (".png", ".jpg", ".jpeg", ".webp", ".heic", ".gif",
+               ".svg", ".bmp", ".tif", ".tiff"):
         return "image"
-    if ext in (".mp4", ".mov", ".mkv"):
+    if ext in (".mp4", ".mov", ".mkv", ".avi", ".webm", ".m4v"):
         return "video"
-    if ext in (".mp3", ".wav", ".m4a"):
+    if ext in (".mp3", ".wav", ".m4a", ".flac", ".aac", ".ogg"):
         return "audio"
-    if ext in (".pptx", ".key"):
+    if ext in (".pptx", ".ppt", ".key", ".odp"):
         return "slides"
     return "file"
 
 
 class Registry:
     def __init__(self, db_path):
-        self.db = sqlite3.connect(db_path)
+        self.db = sqlite3.connect(db_path, timeout=30)
         self.db.row_factory = sqlite3.Row
         self.db.executescript(
             """
@@ -118,7 +120,11 @@ class Registry:
         if row is None:
             asset_id = uuid.uuid4().hex[:12]
             self.db.execute(
-                "INSERT INTO assets VALUES (?,?,?,?,?,?,1,?)",
+                # Named columns: autopilot later ALTERs assets to add
+                # importance/category, so a positional INSERT breaks
+                # on any migrated db.
+                "INSERT INTO assets (id, akey, name, project, atype, "
+                "state, in_inbox, created) VALUES (?,?,?,?,?,?,1,?)",
                 (
                     asset_id,
                     akey,

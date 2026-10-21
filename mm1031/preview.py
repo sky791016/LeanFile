@@ -87,7 +87,7 @@ def ql_thumbnail(path, outdir, size=640):
 
 
 def build_previews(db_path, cache_dir, use_ql=True):
-    db = sqlite3.connect(db_path)
+    db = sqlite3.connect(db_path, timeout=30)
     db.row_factory = sqlite3.Row
     ensure_tables(db)
     path_of = {}
@@ -129,6 +129,11 @@ def build_previews(db_path, cache_dir, use_ql=True):
             "INSERT OR REPLACE INTO previews VALUES (?,?,?,?,?)",
             (digest, kind, thumb, excerpt, title),
         )
+        if stats["assets"] % 100 == 0:
+            # Commit in slices: holding one write transaction for a
+            # whole-library rebuild would lock every other writer
+            # (watcher scans, the app) out for minutes.
+            db.commit()
     db.commit()
     return stats
 
@@ -144,7 +149,7 @@ def infer_conversation_batches(db_path):
     Tool guessed from filename prefixes. Marked inferred=1 - a
     reconstruction, never presented as a recorded fact.
     """
-    db = sqlite3.connect(db_path)
+    db = sqlite3.connect(db_path, timeout=30)
     db.row_factory = sqlite3.Row
     ensure_tables(db)
     rows = db.execute(
@@ -214,7 +219,7 @@ def infer_conversation_batches(db_path):
 
 def conversation_tree(db_path):
     """Conversations with their files: the conversation-first view."""
-    db = sqlite3.connect(db_path)
+    db = sqlite3.connect(db_path, timeout=30)
     db.row_factory = sqlite3.Row
     ensure_tables(db)
     convs = db.execute(
