@@ -258,7 +258,14 @@ final class Database {
             FROM conversations c
             LEFT JOIN provenance p ON p.conversation_id=c.id
             LEFT JOIN versions v ON v.id=p.version_id
-            GROUP BY c.id ORDER BY 5 DESC
+            GROUP BY c.id
+            ORDER BY (SELECT COALESCE(
+                        MAX(MAX(v2.created, COALESCE(l.mtime, 0))),
+                        c.created)
+                      FROM versions v2
+                      JOIN provenance p2 ON p2.version_id=v2.id
+                      LEFT JOIN locations l ON l.hash=v2.blob_hash
+                      WHERE p2.conversation_id=c.id) DESC
             """
         return query(sql).map {
             ConversationRow(id: $0[0], title: $0[1], tool: $0[2],
