@@ -66,7 +66,10 @@
   footer .cols{display:flex;gap:44px;flex-wrap:wrap;justify-content:space-between}
   footer a{color:#DCE7F3} footer .dim{color:#7E97B0}
   .road{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-  .road span{background:#fff;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:7px 16px;font-size:13.5px}
+  .lbl{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:1px}
+  .lbl.p{background:#FDEEE3;color:#9C4A2F}.lbl.f{background:#E8F0F9;color:#0B2B4B}
+  .card p.pain{margin-bottom:8px}
+.road span{background:#fff;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:7px 16px;font-size:13.5px}
 </style>
 </head>
 <body>
@@ -131,16 +134,16 @@
     <h2 data-i18n="scen.title">Ten everyday messes</h2>
     <p class="lede" data-i18n="scen.lede">Where LeanFile earns its keep — the situations its first user actually lives in:</p>
     <div class="grid">
-      <div class="card"><div class="n">1</div><h3 data-i18n="s1.t">The article with twelve “final” versions</h3><p data-i18n="s1.d">Revised with an AI again and again — draft_v1 … final_FINAL_v12. LeanFile keeps exactly one Final; every earlier take stays one click away.</p></div>
-      <div class="card"><div class="n">2</div><h3 data-i18n="s2.t">Video production chaos</h3><p data-i18n="s2.d">A seven-minute film means hundreds of clips, voice takes and renders. Shard groups reunite split takes; one click bundles the whole conversation for delivery.</p></div>
-      <div class="card"><div class="n">3</div><h3 data-i18n="s3.t">Client deliverables</h3><p data-i18n="s3.d">A proposal deck revised across weeks of meetings. The Final is unambiguous — and the bundle is exactly what the client receives.</p></div>
-      <div class="card"><div class="n">4</div><h3 data-i18n="s4.t">AI pair-programming sprawl</h3><p data-i18n="s4.d">Two AI coding tools edit the same project. Process files expire by rule; real code stays classified and searchable.</p></div>
-      <div class="card"><div class="n">5</div><h3 data-i18n="s5.t">Data-analysis runs</h3><p data-i18n="s5.d">One analysis spawns forty CSVs and charts. Categories file them automatically; full-text search finds the one table with the answer.</p></div>
-      <div class="card"><div class="n">6</div><h3 data-i18n="s6.t">The book manuscript</h3><p data-i18n="s6.d">Chapters polished by AI over and over — the version chain stays legible, and any chapter's latest draft packs in one click.</p></div>
-      <div class="card"><div class="n">7</div><h3 data-i18n="s7.t">Bid & proposal war-room</h3><p data-i18n="s7.d">Dozens of attachments, many hands, a hard deadline. One Final per document, and a single-copy alarm on the files that matter.</p></div>
-      <div class="card"><div class="n">8</div><h3 data-i18n="s8.t">AI image batches</h3><p data-i18n="s8.d">One prompt, twenty variants. The preview-thumbnail grid replaces Finder roulette; duplicates vanish.</p></div>
-      <div class="card"><div class="n">9</div><h3 data-i18n="s9.t">Family media vault</h3><p data-i18n="s9.d">Phone and drone footage across a laptop, a desktop and a NAS — registered in one place, with verified second copies for the irreplaceable originals.</p></div>
-      <div class="card"><div class="n">10</div><h3 data-i18n="s10.t">The 3 a.m. “where is that file?”</h3><p data-i18n="s10.d">Something half-remembered from a chat last month: search by what it says, or open the conversation that made it. Milliseconds, not an evening of digging.</p></div>
+      <div class="card"><div class="n">1</div><h3 data-i18n="s1.t">The article with twelve “final” versions</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s1.p">Twelve rounds of AI edits, twelve saves: final, real-final, final-v2… When it's time to send, even you can't say which one counts — and the nightmare is sending the old draft.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s1.f">Exactly one Final, ever. Every earlier take stays one click away in the version line, but “the current version” has only one answer.</span></p></div>
+      <div class="card"><div class="n">2</div><h3 data-i18n="s2.t">Video production chaos</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s2.p">A seven-minute film is hundreds of files — drone originals, voice takes a01–a35, renders v1–v9, a stabilized cut, a light cut… Folders can't tell you which one is the film, and hand-picking files for delivery means one missed file ruins the handover.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s2.f">Files group themselves by the work session; shards are detected as groups; one click bundles each file's best version into a clean folder with a manifest.</span></p></div>
+      <div class="card"><div class="n">3</div><h3 data-i18n="s3.t">Client deliverables</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s3.p">A proposal revised over weeks, with different versions living in chat threads, email and meeting notes. The client asks “did that number change later?” and you need half an hour to answer safely — while fearing you'll send the internal-discussion version.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s3.f">One unambiguous Final, with its source conversation attached. The exported bundle is exactly what the client receives; process versions never slip in.</span></p></div>
+      <div class="card"><div class="n">4</div><h3 data-i18n="s4.t">AI pair-programming sprawl</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s4.p">Two AI coding tools take turns on one project; temp scripts, experiments and generated samples pile up. You dare not commit, dare not delete, and nobody can say which files are the real code.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s4.f">Process files are classed ephemeral and expire by rule into a restorable quarantine; real code stays classified and full-text searchable.</span></p></div>
+      <div class="card"><div class="n">5</div><h3 data-i18n="s5.t">Data-analysis runs</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s5.p">One analysis exports forty CSVs and charts, all named data_final(3).xlsx. Three days later, reusing one table means opening every file by hand.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s5.f">Spreadsheets classify themselves; full-text search finds the table by what's in it; duplicate exports dedup automatically.</span></p></div>
+      <div class="card"><div class="n">6</div><h3 data-i18n="s6.t">The book manuscript</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s6.p">Chapters polished by AI dozens of times, a dozen versions of each scattered across folders. When the editor asks for the latest chapter, you guess from memory and timestamps.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s6.f">Every chapter's version chain stays legible; any chapter's latest draft packs in one click; the submitted draft becomes the one Final.</span></p></div>
+      <div class="card"><div class="n">7</div><h3 data-i18n="s7.t">Bid & proposal war-room</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s7.p">Dozens of attachments, many hands, a hard deadline. Two fears dominate: submitting something that isn't the final version, and a key attachment existing on exactly one laptop whose disk is about to die.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s7.f">One Final per document; single-copy important files raise an alarm and get a hash-verified second copy in one click.</span></p></div>
+      <div class="card"><div class="n">8</div><h3 data-i18n="s8.t">AI image batches</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s8.p">One prompt, twenty images, all named image_4839.png. Picking in Finder is roulette, and afterwards the folder is full of duplicates and rejects.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s8.f">A preview-thumbnail grid shows all of them at once; pick the Final in place; duplicates merge automatically, rejects expire by rule.</span></p></div>
+      <div class="card"><div class="n">9</div><h3 data-i18n="s9.t">Family media vault</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s9.p">A decade of photos and drone footage across a laptop, a desktop and a NAS: the same content stored three times over — while the irreplaceable originals exist exactly once. One dead disk is the family archive gone.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s9.f">One registry sees all three locations; byte-level dedup frees space; irreplaceable originals are classed protected and get verified second copies.</span></p></div>
+      <div class="card"><div class="n">10</div><h3 data-i18n="s10.t">The 3 a.m. “where is that file?”</h3><p class="pain"><span class="lbl p" data-i18n="lbl.p">PAIN</span><span data-i18n="s10.p">On deadline at 3 a.m. you remember an AI wrote the perfect paragraph — or built the perfect table — in some chat last month. You remember roughly what it said, never what it's called. Filename search finds nothing; chat history swallows the evening.</span></p><p><span class="lbl f" data-i18n="lbl.f">FIX</span><span data-i18n="s10.f">Search by what the file says, or open the conversation that made it and see everything it produced. Milliseconds, not an evening of digging.</span></p></div>
     </div>
   </div>
 </section>
@@ -227,7 +230,7 @@ cd macos &amp;&amp; ./build.sh &amp;&amp; open build/Guicang.app</pre>
     </div>
     <div>
       <p><a href="https://github.com/sky791016/LeanFile">GitHub</a> · <a href="https://github.com/sky791016/LeanFile/blob/main/README.zh-CN.md">中文 README</a> · <a href="https://github.com/sky791016/LeanFile/blob/main/LICENSE">Apache 2.0</a></p>
-      <p class="dim">© 2026 Kai Shi (Sky). <span data-i18n="foot.note">Internal codename: guicang.</span></p>
+      <p class="dim">© 2026 Kai Shi (Sky). <span data-i18n="foot.note">Internal codename: MM1031.</span></p>
     </div>
   </div>
 </footer>
@@ -237,28 +240,29 @@ const I18N = {
   zh: {
     "nav.features":"功能",
     "nav.scen":"应用场景",
+    "lbl.p":"痛点","lbl.f":"解法",
     "scen.title":"十个天天发生的乱局",
     "scen.lede":"LeanFile 真正派上用场的地方——它的第一位用户每天都在过的日子：",
     "s1.t":"一篇文章，十二个“终版”",
-    "s1.d":"用 AI 反反复复改稿：初稿 v1……终版_FINAL_v12。LeanFile 里正式版永远只有一个，之前的每一稿都一键可达。",
+    "s1.p":"用 AI 改稿十几轮，每轮都“另存为”：终版、真终版、最终版 2……发给编辑时自己都说不清哪份算数，最怕的是把旧稿发了出去。","s1.f":"正式版永远只有一个；之前每一稿都在版本线里一键可达，“现行版”没有第二个答案。",
     "s2.t":"视频制作的素材洪流",
-    "s2.d":"一条 7 分钟的片子 = 几百个片段、配音分片和渲染稿。分片自动成组；点一次，整次对话的成果打包交付。",
+    "s2.p":"一条 7 分钟的片子 = 几百个文件：航拍原片、配音分片 a01–a35、渲染 v1–v9、防抖版、轻量版……靠文件夹根本分不清哪条是成片；交付时人肉凑文件，漏一个就翻车。","s2.f":"文件按“这一次制作”自动归组，分片识别成组；一键打包，把每个文件的最佳版本装进一个干净文件夹、附清单，交付不用再清点。",
     "s3.t":"给客户的咨询交付",
-    "s3.d":"一份方案 PPT 跨了几周会议反复改。正式版没有歧义——打包出来的，就是发给客户的那一份。",
+    "s3.p":"方案改了几周，微信、邮件、会议纪要里全是不同版本；客户问“上次那个数后来改了吗”，要翻半天才敢答；最怕把内部讨论版发给客户。","s3.f":"正式版唯一，且能查清出自哪次对话；打包导出的就是要发的那一份，内部过程版自动分开，不会混进去。",
     "s4.t":"AI 结对编程的 sprawl",
-    "s4.d":"两个 AI 编程工具同改一个项目。过程文件按规则过期，真代码留得下、分得清、搜得到。",
+    "s4.p":"两个 AI 编程工具轮流改一个项目，临时脚本、试错文件、生成的样例堆满目录；不敢提交、删又怕删错，项目越滚越大，谁也说不清哪些是真代码。","s4.f":"过程文件被标为“临时”，按规则过期进隔离区（随时可恢复）；真代码自动分类、全文可搜，目录瘦下来还找得到。",
     "s5.t":"一次数据分析，四十个文件",
-    "s5.d":"CSV 和图表满天飞。分类自动归档；全文检索直接找出有答案的那张表。",
+    "s5.p":"一次分析导出 40 多个 CSV 和图表，名字全是 data_final(3).xlsx；三天后想复用其中一张表，只能逐个打开看。","s5.f":"表格自动归类；全文检索按内容里的词直接定位那张表；重复导出自动去重。",
     "s6.t":"写书与治学",
-    "s6.d":"书稿章节被 AI 一遍遍润色——版本线清清楚楚，任意一章的最新稿一键打包。",
+    "s6.p":"书稿被 AI 润色几十遍，每章十几个版本散在不同文件夹；编辑催稿时找“最新那章”，要靠记忆和时间戳猜。","s6.f":"每章的版本线清清楚楚；任意一章的最新稿一键打包；交稿版设为正式版之后，不会再被误改、混淆。",
     "s7.t":"投标与申报的战时状态",
-    "s7.d":"几十份附件、很多人手、一个死线。每份文件只有一个正式版，重要的那几份有单副本报警。",
+    "s7.p":"几十份附件、多个同事经手、截止时间卡死。最怕两件事：交上去的不是最终版；关键附件只在某台电脑里，盘一坏全完。","s7.f":"每份文件只有一个正式版；重要文件只有一份时实时报警，一键补第二副本并逐个验哈希。",
     "s8.t":"AI 生图，一次二十张",
-    "s8.d":"预览图网格挑图，告别在 Finder 里开盲盒；重复的自动消失。",
+    "s8.p":"一个提示词出 20 张图，文件名全是 image_4839.png，在 Finder 里一张张点开挑，挑完还剩一地重复和废稿。","s8.f":"预览图网格一次看全，选中即设为正式版；重复自动合并，废稿按规则过期清理。",
     "s9.t":"家庭影像库",
-    "s9.d":"手机和无人机素材散在笔记本、台式机和 NAS 上——一处登记看全貌，不可再生的原片有验过哈希的第二副本。",
+    "s9.p":"十几年的照片、无人机素材散在笔记本、台式机、NAS 三处：同样的内容存了好几份占着空间，真原件却往往只有一份——硬盘一坏，就是全家的记忆。","s9.f":"三处文件一处登记看全貌；字节级去重腾空间；不可再生的原片自动列为“重要”，补上验过哈希的第二副本。",
     "s10.t":"凌晨三点的“那个文件在哪？”",
-    "s10.d":"上个月某次对话里模模糊糊记得的东西：按内容搜，或者打开那次对话。是几毫秒，不是一晚上翻箱倒柜。","nav.how":"原理","nav.bench":"性能实测","nav.open":"开源与云",
+    "s10.p":"凌晨赶稿，想起上个月某次对话里 AI 写过一段特别好的话、做过一张特别合适的表——只记得大概内容，按文件名根本搜不到，翻聊天记录翻到崩溃。","s10.f":"按内容全文检索，或者直接打开“那次对话”看它产出的全部文件。是几毫秒，不是一晚上翻箱倒柜。","nav.how":"原理","nav.bench":"性能实测","nav.open":"开源与云",
     "hero.tag":"你的 AI 生成的每一个文件——自动汇聚、自动去重、按对话组织、毫秒级找回。",
     "hero.sub":"AI 工具生产草稿、变体、渲染稿和分片的速度，已经超过任何文件夹体系能承受的程度。LeanFile 是位于你的文件之上的一层资产层，安静地把它们管起来。",
     "hero.cta1":"在 GitHub 查看","hero.cta2":"快速开始",
@@ -295,7 +299,7 @@ const I18N = {
     "start.title":"快速开始",
     "start.lede":"引擎今天是一个 Python CLI；macOS 应用只需 Command Line Tools 即可构建。",
     "foot.family":"史凯（Kai Shi）的 Lean 家族一员——《精益数据方法论》· Lean AI · LeanFDE。",
-    "foot.note":"内部代号：guicang。"
+    "foot.note":"内部代号：MM1031。"
   }
 };
 function setLang(l){

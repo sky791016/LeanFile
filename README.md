@@ -29,7 +29,7 @@ sits on top of your files and quietly keeps them in order.
 
 > LeanFile is part of the Lean family by Kai Shi — alongside the
 > Lean Data Methodology, Lean AI and LeanFDE: lean thinking applied
-> to the file chaos of the AI era. (Internal codename: `guicang`.)
+> to the file chaos of the AI era. (Internal codename: `MM1031`.)
 
 ## What it does — five outcomes, not process data
 
@@ -56,35 +56,85 @@ Users don't care about version graphs. They care that:
 
 ## Scenarios — ten everyday messes
 
-1. **The article with twelve “final” versions.** A piece is revised
-   with an AI again and again — draft_v1 … final_FINAL_v12. LeanFile
-   keeps exactly one Final; every earlier take stays one click away.
-2. **Video production chaos.** A seven-minute film means hundreds of
-   clips, voice takes and renders. Shard groups reunite split takes;
-   one click bundles the whole conversation for delivery.
-3. **Client deliverables.** A proposal deck revised across weeks of
-   meetings. The Final is unambiguous — and the bundle is exactly
-   what the client receives.
-4. **AI pair-programming sprawl.** Two AI coding tools edit the same
-   project. Process files expire by rule; real code stays classified
-   and searchable.
-5. **Data-analysis runs.** One analysis spawns forty CSVs and charts.
-   Categories file them automatically; full-text search finds the one
-   table with the answer.
-6. **The book manuscript.** Chapters polished by AI over and over —
-   the version chain stays legible, and any chapter's latest draft
-   packs in one click.
-7. **Bid & proposal war-room.** Dozens of attachments, many hands, a
-   hard deadline. One Final per document, and a single-copy alarm on
-   the files that matter.
-8. **AI image batches.** One prompt, twenty variants. The
-   preview-thumbnail grid replaces Finder roulette; duplicates vanish.
-9. **Family media vault.** Phone and drone footage across a laptop, a
-   desktop and a NAS — registered in one place, with verified second
-   copies for the irreplaceable originals.
-10. **The 3 a.m. “where is that file?”** Something you half-remember
-    from a chat last month: search by what it says, or open the
-    conversation that made it. Milliseconds, not an evening of digging.
+**1. The article with twelve “final” versions.**
+*Pain:* Twelve rounds of AI edits, twelve saves: final, real-final,
+final-v2… When it's time to send, even you can't say which one counts —
+and the nightmare is sending the old draft.
+*Fix:* Exactly one Final, ever. Every earlier take stays one click away
+in the version line, but “the current version” has only one answer.
+
+**2. Video production chaos.**
+*Pain:* A seven-minute film is hundreds of files — drone originals,
+voice takes a01–a35, renders v1–v9, a stabilized cut, a light cut…
+Folders can't tell you which one is *the* film, and hand-picking files
+for delivery means one missed file ruins the handover.
+*Fix:* Files group themselves by the work session; shards are detected
+as groups; one click bundles each file's best version into a clean
+folder with a manifest. No more counting by hand.
+
+**3. Client deliverables.**
+*Pain:* A proposal revised over weeks, with different versions living
+in chat threads, email and meeting notes. The client asks “did that
+number change later?” and you need half an hour to answer safely —
+while fearing you'll send the internal-discussion version.
+*Fix:* One unambiguous Final, with its source conversation attached.
+The bundle you export is exactly what the client receives; internal
+process versions never slip in.
+
+**4. AI pair-programming sprawl.**
+*Pain:* Two AI coding tools take turns on one project; temp scripts,
+experiments and generated samples pile up. You dare not commit, dare
+not delete, and nobody can say which files are the real code.
+*Fix:* Process files are classed *ephemeral* and expire by rule into a
+restorable quarantine; real code stays classified and full-text
+searchable.
+
+**5. Data-analysis runs.**
+*Pain:* One analysis exports forty CSVs and charts, all named
+data_final(3).xlsx. Three days later, reusing one table means opening
+every file by hand.
+*Fix:* Spreadsheets classify themselves; full-text search finds the
+table by what's *in* it; duplicate exports dedup automatically.
+
+**6. The book manuscript.**
+*Pain:* Chapters polished by AI dozens of times, a dozen versions of
+each scattered across folders. When the editor asks for the latest
+chapter, you guess from memory and timestamps.
+*Fix:* Every chapter's version chain stays legible; any chapter's
+latest draft packs in one click; the submitted draft becomes the one
+Final and can't be confused again.
+
+**7. Bid & proposal war-room.**
+*Pain:* Dozens of attachments, many hands, a hard deadline. Two fears
+dominate: submitting something that isn't the final version, and a key
+attachment existing on exactly one laptop whose disk is about to die.
+*Fix:* One Final per document; single-copy important files raise an
+alarm and get a hash-verified second copy in one click.
+
+**8. AI image batches.**
+*Pain:* One prompt, twenty images, all named image_4839.png. Picking
+in Finder is roulette, and afterwards the folder is full of duplicates
+and rejects.
+*Fix:* A preview-thumbnail grid shows all of them at once; pick the
+Final in place; duplicates merge automatically, rejects expire by rule.
+
+**9. Family media vault.**
+*Pain:* A decade of photos and drone footage across a laptop, a
+desktop and a NAS: the same content stored three times over — while
+the irreplaceable originals exist exactly once. One dead disk is the
+family archive gone.
+*Fix:* One registry sees all three locations; byte-level dedup frees
+space; irreplaceable originals are classed *protected* and get
+verified second copies.
+
+**10. The 3 a.m. “where is that file?”**
+*Pain:* On deadline at 3 a.m. you remember an AI wrote the perfect
+paragraph — or built the perfect table — in some chat last month. You
+remember roughly what it said, never what it's called. Filename search
+finds nothing; chat history swallows the evening.
+*Fix:* Search by what the file *says*, or open the conversation that
+made it and see everything it produced. Milliseconds, not an evening
+of digging.
 
 ## Organized by conversation
 
